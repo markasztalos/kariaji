@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Kariaji.WebApi.DAL
+namespace Kariaji.WebApi.Models
 {
-    public class User
+    public class LoginModel
     {
-        public int Id { get; set; }
-
-        public string DisplayName { get; set; }
         public string Email { get; set; }
+        public string Password { get; set; }
 
-        
+
     }
 }

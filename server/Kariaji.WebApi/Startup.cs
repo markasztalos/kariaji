@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Kariaji.WebApi.DAL;
+using Kariaji.WebApi.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -32,6 +33,8 @@ namespace Kariaji.WebApi
             var connection = @"Server=(localdb)\kariaji;Database=kariajiBeta;Trusted_Connection=True;ConnectRetryCount=0";
             services.AddDbContext<KariajiContext>
                 (options => options.UseSqlServer(connection));
+
+            services.AddScoped(typeof(AuthenticationService));
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
