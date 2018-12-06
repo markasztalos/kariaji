@@ -8,6 +8,8 @@ import { MainNavComponent } from './components/common/main-nav/main-nav.componen
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { LoginPageComponent } from './components/common/login/login-page.component';
+import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
+import { AuthenticationInterceptorService } from './services/authentication-interceptor.service';
 
 @NgModule({
   declarations: [
@@ -19,9 +21,14 @@ import { LoginPageComponent } from './components/common/login/login-page.compone
   imports: [
     BrowserModule,
     AppRoutingModule,
-    FontAwesomeModule 
+    FontAwesomeModule,
+    HttpClientModule
   ],
-  providers: [],
+  providers: [{
+    provide: HTTP_INTERCEPTORS,
+    useClass: AuthenticationInterceptorService,
+    multi: true
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }
