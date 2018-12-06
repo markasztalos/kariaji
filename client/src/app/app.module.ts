@@ -7,12 +7,14 @@ import { MainComponent } from './components/common/main/main.component';
 import { MainNavComponent } from './components/common/main-nav/main-nav.component';
 
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { LoginPageComponent } from './components/common/login/login-page.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     MainComponent,
-    MainNavComponent
+    MainNavComponent,
+    LoginPageComponent
   ],
   imports: [
     BrowserModule,
