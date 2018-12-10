@@ -5,31 +5,58 @@ using System.Threading.Tasks;
 using Kariaji.WebApi.DAL;
 using Kariaji.WebApi.Models;
 using Kariaji.WebApi.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 namespace Kariaji.WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/auth")]
     [ApiController]
-    public class AuthenticationController : ControllerBase
+    public class AuthenticationController : KariajiBaseController
     {
-        private KariajiContext ctx;
-        private AuthenticationService authSvc;
-        public AuthenticationController(KariajiContext ctx, AuthenticationService authSvc)
+        public AuthenticationController(AuthenticationService authSvc) : base(authSvc)
         {
-            this.ctx = ctx;
-            this.authSvc = authSvc;
         }
 
-        [HttpGet("login")]
-        public async Task<ActionResult<bool>> login()
+        [HttpPost("login")]
+        public async Task<ActionResult<LoginResultModel>> Login([FromBody]LoginModel model)
         {
             //var users = await this.ctx.Users.ToListAsync();
             //return users.Count;
-            return await this.authSvc.CheckPassword();
 
+            await this.authSvc.CheckPassword(model.Email, model.Password);
+            return Ok(new LoginResultModel
+            {
+                Token = await this.authSvc.GenerateToken(model.Email)
+            });
+        }
+
+        [HttpPost("register")]
+        public async Task<ActionResult<RegisterResultModel>> Register([FromBody] RegisterModel model)
+        {
+            var link = await this.authSvc.Register(model.Email);
+            return Ok(new RegisterResultModel
+            {
+                Link = link
+            });
+        }
+
+        [HttpPost("confirm-registration")]
+        public async Task<ActionResult> ConfirmRegistration([FromBody] ConfirmRegistrationModel model)
+        {
+            await this.authSvc.ConfirmRegistration(model.Token, model.Password);
+            return Ok();
+        }
+
+        [Authorize]
+        [HttpGet]
+        [Route("test")]
+        public async Task<ActionResult> Test()
+        {
+
+            return Ok(this.CurrentUser.Email);
         }
     }
 }

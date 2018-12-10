@@ -14,5 +14,7 @@ namespace Kariaji.WebApi.DAL
         }
 
         public DbSet<User> Users { get;set; }
+        public DbSet<Configuration> Configurations { get;set; }
+
     }
 }

@@ -1,0 +1,18 @@
+<div class="d-flex flex-column justify-content-center align-items-center" style="position: absolute; left:0; top:0; bottom:0; right:0; background-color: #F6F6F6F6; ">
+  <form>
+    <div class="text-center">
+      <img src="../../assets/gift-icon.png" width="128" height="128" class="mb-4" alt="Kariaji" />
+    </div>
+    <div class="text-center">
+      <h1 class="h3 mb-3"> Regisztráció</h1>
+    </div>
+    <input class="mb-1 form-control" type="email" name="email1" [(ngModel)]="email1" placeholder="Email cím" />
+    <input class="mb-1 form-control" type="email" name="email2" [(ngModel)]="email2" placeholder="Email cím mégegyszer" />
+    <button class="btn btn-lg btn-primary btn-block mb-3" [disabled]="(email1 !== email2) || !email1 || !email2" (click)="register()">Regisztrálok</button>
+
+    <a class="mb-3" [href]="['/login']">Bejelentkezés</a>
+
+    <a *ngIf="link" [href]="link">Megerősítés</a>
+  </form>
+
+</div>

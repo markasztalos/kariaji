@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kariaji.WebApi.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/values")]
     [ApiController]
     public class ValuesController : ControllerBase
     {
@@ -17,6 +18,7 @@ namespace Kariaji.WebApi.Controllers
             return new string[] { "value1", "value2" };
         }
 
+        [Authorize]
         // GET api/values/5
         [HttpGet("{id}")]
         public ActionResult<string> Get(int id)

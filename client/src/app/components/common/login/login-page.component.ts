@@ -1,4 +1,6 @@
 import { Component, OnInit } from '@angular/core';
+import { AuthenticationService } from 'src/app/services/authentication.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'kariaji-login',
@@ -7,12 +9,16 @@ import { Component, OnInit } from '@angular/core';
 })
 export class LoginPageComponent implements OnInit {
 
-  constructor() { }
+  constructor(private authSvc: AuthenticationService, private router : Router) { }
 
   ngOnInit() {
+    this.authSvc.resetToken();
   }
 
-  login() {
+  email : string;
+  password : string;
+  async login() {
+    await this.authSvc.loginAsync(this.email, this.password);
     
   }
 

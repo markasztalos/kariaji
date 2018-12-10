@@ -10,6 +10,8 @@ using Microsoft.Extensions.Logging;
 
 namespace Kariaji.WebApi
 {
+    
+
     public class Program
     {
         public static void Main(string[] args)
