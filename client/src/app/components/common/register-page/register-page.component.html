@@ -1,4 +1,34 @@
-<div class="d-flex flex-column justify-content-center align-items-center" style="position: absolute; left:0; top:0; bottom:0; right:0; background-color: #F6F6F6F6; ">
+<div style="margin-top:20%;" fxLayout="row" fxLayoutAlign="center center">
+  <mat-card>
+    <mat-card-title>
+      Kariaji
+      <mat-card-subtitle>
+        Regisztráció
+      </mat-card-subtitle>
+    </mat-card-title>
+    <mat-card-content>
+      <form class="full-width">
+        <mat-form-field>
+          <input matInput type="email" name="email1" [(ngModel)]="email1" placeholder="Email cím" />
+        </mat-form-field>
+        <br />
+        <mat-form-field>
+          <input matInput type="email" name="email2" [(ngModel)]="email2" placeholder="Email cím mégegyszer" />
+        </mat-form-field>
+      </form>
+
+
+    </mat-card-content>
+    <mat-card-actions>
+      <button mat-raised-button color="primary" [disabled]="(email1 !== email2) || !email1 || !email2" (click)="register()">Regisztrálok</button>
+      <a mat-button [href]="['/login']">Bejelentkezés</a>
+      <a *ngIf="link" mat-button [href]="link">Megerősítés</a>
+    </mat-card-actions>
+
+  </mat-card>
+</div>
+
+<!-- <div class="d-flex flex-column justify-content-center align-items-center" style="position: absolute; left:0; top:0; bottom:0; right:0; background-color: #F6F6F6F6; ">
   <form>
     <div class="text-center">
       <img src="../../assets/gift-icon.png" width="128" height="128" class="mb-4" alt="Kariaji" />
@@ -15,4 +45,4 @@
     <a *ngIf="link" [href]="link">Megerősítés</a>
   </form>
 
-</div>
+</div> -->

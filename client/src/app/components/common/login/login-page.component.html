@@ -1,4 +1,33 @@
-<div class="d-flex flex-column justify-content-center align-items-center" style="position: absolute; left:0; top:0; bottom:0; right:0; background-color: #F6F6F6F6; ">
+<div style="margin-top:20%;" fxLayout="row" fxLayoutAlign="center center">
+  <mat-card>
+    <mat-card-title>
+      Kariaji
+      <mat-card-subtitle>
+        Bejelentkezés
+      </mat-card-subtitle>
+    </mat-card-title>
+    <mat-card-content>
+      <form class="full-width">
+        <mat-form-field>
+          <input matInput  id="email" name="email" type="email" placeholder="Email cím" [(ngModel)]="email"/>
+        </mat-form-field>
+        <br />
+        <mat-form-field>
+            <input matInput id="password" name="password" type="password" placeholder="Jelszó" [(ngModel)]="password" />
+        </mat-form-field>
+      </form>
+
+
+    </mat-card-content>
+    <mat-card-actions>
+        <button mat-raised-button color="primary" [disabled]="!email || !password" class="btn btn-lg btn-primary btn-block mb-3" (click)="login()">Belépés</button>
+        <a mat-button [href]="['/register']">Regisztráció</a>
+    </mat-card-actions>
+
+  </mat-card>
+</div>
+
+<!-- <div class="d-flex flex-column justify-content-center align-items-center" style="position: absolute; left:0; top:0; bottom:0; right:0; background-color: #F6F6F6F6; ">
   <form>
     <div class="text-center">
       <img src="../../assets/gift-icon.png" width="128" height="128" class="mb-4" alt="Kariaji" />
@@ -6,31 +35,10 @@
     <div class="text-center">
       <h1 class="h3 mb-3"> Bejelentkezés</h1>
     </div>
-    <!-- <div class="form-group">
-      <label for="email">Email cím</label> -->
     <input class="mb-1 form-control" id="email" name="email" type="email" placeholder="Email cím" [(ngModel)]="email"/>
-    <!-- </div>
-    <div class="form-group">
-      <label for="email">Jelszó</label> -->
     <input class="mb-4 form-control" id="password" name="password" type="password" placeholder="Jelszó" [(ngModel)]="password" />
-    <!-- </div> -->
     <button [disabled]="!email || !password" class="btn btn-lg btn-primary btn-block mb-3" (click)="login()">Belépés</button>
     <a [href]="['/register']">Regisztráció</a>
   </form>
 </div>
-
-<!-- <form class="form-signin">
-  <img class="mb-4" src="../../assets/gift-icon.png" alt="" width="72" height="72">
-  <h1 class="h3 mb-3 font-weight-normal">Please sign in</h1>
-  <label for="inputEmail" class="sr-only">Email address</label>
-  <input type="email" id="inputEmail" class="form-control" placeholder="Email address" required autofocus>
-  <label for="inputPassword" class="sr-only">Password</label>
-  <input type="password" id="inputPassword" class="form-control" placeholder="Password" required>
-  <div class="checkbox mb-3">
-    <label>
-      <input type="checkbox" value="remember-me"> Remember me
-    </label>
-  </div>
-  <button class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
-  <p class="mt-5 mb-3 text-muted">&copy; 2017-2018</p>
-</form> -->
+ -->

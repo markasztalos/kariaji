@@ -1,4 +1,12 @@
-import { BrowserModule } from '@angular/platform-browser';
+import {MatMenuModule} from '@angular/material/menu';
+import {MatToolbarModule} from '@angular/material/toolbar';
+
+import {MatCardModule} from '@angular/material/card';
+import {MatInputModule} from '@angular/material/input';
+
+import {MatButtonModule} from '@angular/material/button';
+import { FlexLayoutModule } from '@angular/flex-layout';
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 import {FormsModule} from '@angular/forms';
 
@@ -24,8 +32,15 @@ import { ConfirmRegistrationComponent } from './components/common/confirm-regist
     ConfirmRegistrationComponent
   ],
   imports: [
+    MatInputModule,
+    MatToolbarModule,
     BrowserModule,
+    MatMenuModule,
+    FlexLayoutModule,
+    MatButtonModule,
+    BrowserAnimationsModule,
     AppRoutingModule,
+    MatCardModule,
     FontAwesomeModule,
     HttpClientModule,
     FormsModule
