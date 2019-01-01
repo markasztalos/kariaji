@@ -17,7 +17,7 @@ namespace Kariaji.WebApi.Controllers
     [Authorize]
     public class GroupsController : KariajiBaseController
     {
-        public GroupsController(AuthenticationService authSvc) : base(authSvc)
+        public GroupsController(UserGroupManagerService ugSvc) : base(ugSvc)
         {
         }
         

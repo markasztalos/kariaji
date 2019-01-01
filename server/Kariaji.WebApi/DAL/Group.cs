@@ -17,16 +17,16 @@ namespace Kariaji.WebApi.DAL
         public User CreatorUser {get; set; }
         public int CreatorUserId { get; set; }
 
-        public ICollection<GroupMemberhips> Memberships { get; set; }
+        public ICollection<Membership> Memberships { get; set; }
 
     }
 
-    public class GroupMemberhips
+    public class Membership
     {
         public int GroupId { get; set; }
-        public int MemberUserId { get; set; }
+        public int UserId { get; set; }
         public Group Group { get; set; }
-        public User MemberUser { get; set; }
+        public User User { get; set; }
         public bool IsAdministrator { get; set; }
         public bool IsDeleted { get; set; }
     }

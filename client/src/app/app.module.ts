@@ -1,4 +1,6 @@
 import {MatMenuModule} from '@angular/material/menu';
+import {MatSnackBarModule} from '@angular/material/snack-bar';
+import { NgReduxModule, NgRedux } from '@angular-redux/store';
 import {MatToolbarModule} from '@angular/material/toolbar';
 
 import {MatCardModule} from '@angular/material/card';
@@ -21,6 +23,11 @@ import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { AuthenticationInterceptorService } from './services/authentication-interceptor.service';
 import { RegisterPageComponent } from './components/common/register-page/register-page.component';
 import { ConfirmRegistrationComponent } from './components/common/confirm-registration/confirm-registration.component';
+import { IKariajiAppState } from './store/app.state';
+import { kariajiReduxStore } from './store/app.store';
+import { MyAccountActions, MyAccountStateWrapperService } from './store/user-groups.redux';
+import { SettingsComponent } from './components/settings/settings.component';
+import { MyAccountApiService } from './services/my-account.service';
 
 @NgModule({
   declarations: [
@@ -29,12 +36,14 @@ import { ConfirmRegistrationComponent } from './components/common/confirm-regist
     MainNavComponent,
     LoginPageComponent,
     RegisterPageComponent,
-    ConfirmRegistrationComponent
+    ConfirmRegistrationComponent,
+    SettingsComponent
   ],
   imports: [
     MatInputModule,
     MatToolbarModule,
     BrowserModule,
+    MatSnackBarModule,
     MatMenuModule,
     FlexLayoutModule,
     MatButtonModule,
@@ -43,13 +52,23 @@ import { ConfirmRegistrationComponent } from './components/common/confirm-regist
     MatCardModule,
     FontAwesomeModule,
     HttpClientModule,
-    FormsModule
+    FormsModule,
+    NgReduxModule 
   ],
   providers: [{
     provide: HTTP_INTERCEPTORS,
     useClass: AuthenticationInterceptorService,
     multi: true
-  }],
+  },
+  MyAccountActions,
+  MyAccountStateWrapperService,
+  MyAccountApiService
+
+],
   bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+  constructor(ngRedux: NgRedux<IKariajiAppState>) {
+    ngRedux.provideStore(kariajiReduxStore);
+  }
+ }

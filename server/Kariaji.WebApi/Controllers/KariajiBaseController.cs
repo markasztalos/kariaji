@@ -12,10 +12,10 @@ namespace Kariaji.WebApi.Controllers
 {
     public class KariajiBaseController : ControllerBase
     {
-        protected AuthenticationService authSvc;
-        public KariajiBaseController(AuthenticationService authSvc)
+        protected UserGroupManagerService ugSvc;
+        public KariajiBaseController(UserGroupManagerService ugSvc)
         {
-            this.authSvc = authSvc;
+            this.ugSvc = ugSvc;
         }
 
         private User _CurrentUser;
@@ -28,7 +28,7 @@ namespace Kariaji.WebApi.Controllers
                     var nameIdClaimValue = this.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
                     if (nameIdClaimValue != null && int.TryParse(nameIdClaimValue, out int id))
                     {
-                        this._CurrentUser = this.authSvc.GetUserById(id);
+                        this._CurrentUser = this.ugSvc.GetUserById(id);
                     }
                 }
 

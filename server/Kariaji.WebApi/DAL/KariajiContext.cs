@@ -16,16 +16,16 @@ namespace Kariaji.WebApi.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<GroupAdministrator>()
-                .HasKey(bc => new { bc.GroupId, bc.AdministratorId });
-            modelBuilder.Entity<GroupAdministrator>()
+            modelBuilder.Entity<Membership>()
+                .HasKey(bc => new { bc.GroupId, MemberUserId = bc.UserId });
+            modelBuilder.Entity<Membership>()
                 .HasOne(bc => bc.Group)
-                .WithMany(b => b.GroupAdministrators)
+                .WithMany(b => b.Memberships)
                 .HasForeignKey(bc => bc.GroupId);
-            modelBuilder.Entity<GroupAdministrator>()
-                .HasOne(bc => bc.Administrator)
-                .WithMany(c => c.GroupAdministrators)
-                .HasForeignKey(bc => bc.AdministratorId);
+            modelBuilder.Entity<Membership>()
+                .HasOne(bc => bc.User)
+                .WithMany(c => c.Memberships)
+                .HasForeignKey(bc => bc.UserId);
 
             modelBuilder.WithDisabledCascadeDeleteOnForeignKeys();
 
@@ -36,6 +36,6 @@ namespace Kariaji.WebApi.DAL
         public DbSet<User> Users { get; set; }
         public DbSet<Configuration> Configurations { get; set; }
         public DbSet<Group> Groups { get; set; }
-        public DbSet<GroupAdministrator> GroupAdministrators { get; set; }
+        public DbSet<Membership> Memberships { get; set; }
     }
 }

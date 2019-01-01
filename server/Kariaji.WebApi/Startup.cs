@@ -18,6 +18,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using Newtonsoft.Json.Serialization;
+using ILogger = NLog.ILogger;
 
 namespace Kariaji.WebApi
 {
@@ -82,7 +84,10 @@ namespace Kariaji.WebApi
 
             services.AddCors();
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc()
+                .AddJsonOptions(options => options.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver())
+                .SetCompatibilityVersion(CompatibilityVersion.Version_2_1)
+                ;
 
 
 
@@ -95,6 +100,7 @@ namespace Kariaji.WebApi
             services.AddScoped(typeof(MailingService));
             services.AddScoped(typeof(ConfigurationProviderService));
             services.AddScoped(typeof(ProtectionService));
+            services.AddScoped(typeof(UserGroupManagerService));
 
 
         }

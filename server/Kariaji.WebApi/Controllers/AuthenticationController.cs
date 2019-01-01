@@ -16,8 +16,10 @@ namespace Kariaji.WebApi.Controllers
     [ApiController]
     public class AuthenticationController : KariajiBaseController
     {
-        public AuthenticationController(AuthenticationService authSvc) : base(authSvc)
+        private AuthenticationService authSvc;
+        public AuthenticationController(UserGroupManagerService ugSvc, AuthenticationService authSvc) : base(ugSvc)
         {
+            this.authSvc = authSvc;
         }
 
         [HttpPost("login")]

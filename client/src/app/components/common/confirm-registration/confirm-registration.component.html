@@ -1,4 +1,33 @@
-<div class="d-flex flex-column justify-content-center align-items-center" style="position: absolute; left:0; top:0; bottom:0; right:0; background-color: #F6F6F6F6; ">
+<div style="margin-top:10%;" fxLayout="row" fxLayoutAlign="center center">
+    <mat-card>
+      <mat-card-title>
+        Kariaji
+        <mat-card-subtitle>
+            Regisztráció megerősítése
+        </mat-card-subtitle>
+      </mat-card-title>
+      <mat-card-content>
+        <form class="full-width">
+          <mat-form-field>
+              <input matInput type="password" name="password1" [(ngModel)]="password1" placeholder="Jelszó" />
+          </mat-form-field>
+          <br />
+          <mat-form-field>
+              <input matInput type="password" name="password2" [(ngModel)]="password2" placeholder="Jelszó mégegyszer" />
+          </mat-form-field>
+        </form>
+  
+  
+      </mat-card-content>
+      <mat-card-actions>
+          <button color="primary" mat-raised-button [disabled]="!password1 || !password2 || (password1 !== password2)" (click)="confirm()">Elküld</button>
+      </mat-card-actions>
+  
+    </mat-card>
+  </div>
+  
+
+<!-- <div class="d-flex flex-column justify-content-center align-items-center" style="position: absolute; left:0; top:0; bottom:0; right:0; background-color: #F6F6F6F6; ">
   <form>
     <div class="text-center">
       <img src="../../assets/gift-icon.png" width="128" height="128" class="mb-4" alt="Kariaji" />
@@ -6,11 +35,10 @@
     <div class="text-center">
       <h1 class="h3 mb-3"> Regisztráció megerősítése</h1>
     </div>
-    <!-- <input class="mb-1 form-control" type="email" name="email" [value]="email" readonly="true" /> -->
     <input class="mb-1 form-control" type="password" name="password1" [(ngModel)]="password1" placeholder="Jelszó" />
     <input class="mb-1 form-control" type="password" name="password2" [(ngModel)]="password2" placeholder="Jelszó mégegyszer" />
     <button class="btn btn-lg btn-primary btn-block" [disabled]="!password1 || !password2 || (password1 !== password2)" (click)="confirm()">Elküld</button>
 
   </form>
 
-</div>
+</div> -->

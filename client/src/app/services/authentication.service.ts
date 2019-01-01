@@ -4,15 +4,17 @@ import { map } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
 import { environment } from 'src/environments/environment';
 import { CanActivate, Router } from '@angular/router';
+import { MyAccountActions } from '../store/kariaji.store.public';
+import { ApiBaseService } from './api-base-service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Injectable({
   providedIn: 'root'
 })
-export class AuthenticationService implements CanActivate {
+export class AuthenticationService extends ApiBaseService implements CanActivate {
 
-  private apiBaseUrl: string;
-  constructor(private http: HttpClient, public router: Router) {
-    this.apiBaseUrl = environment.siteBaseUrl + "api";
+  constructor(http: HttpClient, public router: Router, snackBar: MatSnackBar) {
+    super(http, snackBar);
   }
 
   public register(email: string): Observable<{ link: string }> {
@@ -47,6 +49,7 @@ export class AuthenticationService implements CanActivate {
 
   public writeToken(token: string) {
     localStorage['authToken'] = token;
+    
   }
 
   public resetToken() {
@@ -54,7 +57,9 @@ export class AuthenticationService implements CanActivate {
   }
 
   public loginAsync(email: string, password: string): Observable<any> {
-    const obs = this.http.post<{ token: string }>(`${this.apiBaseUrl}/auth/login`, { email, password });
+    const obs = this.handleError(
+    this.http.post<{ token: string }>(`${this.apiBaseUrl}/auth/login`, { email, password }));
+
     obs.subscribe(data => {
       this.writeToken(data.token);
       this.router.navigate(['']);

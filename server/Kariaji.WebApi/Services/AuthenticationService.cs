@@ -8,6 +8,7 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using Kariaji.WebApi.DAL;
+using Kariaji.WebApi.Middlewares;
 using Kariaji.WebApi.Models;
 using Microsoft.AspNetCore.Cryptography.KeyDerivation;
 using Microsoft.AspNetCore.DataProtection;
@@ -39,12 +40,12 @@ namespace Kariaji.WebApi.Services
             var user = await this.ctx.Users.FirstOrDefaultAsync(u => u.Email == em);
             if (user == null)
             {
-                throw new Exception("Ez az email cím még nincs regisztrálva");
+                throw KariajiException.NewPublic("Ez az email cím még nincs regisztrálva");
             }
 
             if (this.protectionService.HashPassword(password) != user.Password)
             {
-                throw new Exception("Hibás jelszó");
+                throw KariajiException.NewPublic("Hibás jelszó");
             }
         }
 
@@ -56,13 +57,13 @@ namespace Kariaji.WebApi.Services
             var date = registrationData.RequestDate;
             if (date.AddDays(1) < DateTime.Now)
             {
-                throw new Exception("Ez a kód már lejárt");
+                throw KariajiException.NewPublic("Ez a kód már lejárt");
             }
             var email = registrationData.Email;
             var existingUser = await ctx.Users.FirstOrDefaultAsync(u => u.Email.ToLower() == email.ToLower());
             if (existingUser != null)
             {
-                throw new Exception("Ezt az email címet már regisztrálták");
+                throw KariajiException.NewPublic("Ezt az email címet már regisztrálták");
             }
 
             var user = new User
@@ -84,7 +85,7 @@ namespace Kariaji.WebApi.Services
             var user = await ctx.Users.FirstOrDefaultAsync(u => u.Email == em);
             if (user != null)
             {
-                throw new Exception("Ezt az email címet már regisztrálták");
+                throw KariajiException.NewPublic("Ezt az email címet már regisztrálták");
             }
 
 
@@ -107,7 +108,7 @@ namespace Kariaji.WebApi.Services
             var user = await ctx.Users.FirstOrDefaultAsync(u => u.Email == em);
             if (user == null)
             {
-                throw new Exception("Hibás adatok");
+                throw KariajiException.NewPublic("Hibás adatok");
             }
 
             var jwtHandler = new JwtSecurityTokenHandler();
@@ -157,9 +158,6 @@ namespace Kariaji.WebApi.Services
 
         }
 
-        public User GetUserById(int id)
-        {
-            return this.ctx.Users.FirstOrDefault(u => u.Id == id);
-        }
+     
     }
 }

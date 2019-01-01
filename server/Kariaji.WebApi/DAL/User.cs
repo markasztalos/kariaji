@@ -14,7 +14,7 @@ namespace Kariaji.WebApi.DAL
         public string Password { get; set; }
 
 
-        public ICollection<GroupMemberhips> Memberships { get; set; }
+        public ICollection<Membership> Memberships { get; set; }
         
     }
 }
