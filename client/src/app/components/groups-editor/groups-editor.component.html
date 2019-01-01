@@ -1,0 +1,70 @@
+
+
+<mat-card style="margin-top: 1em;">
+  <mat-card-title>Csoportjaim</mat-card-title>
+  <mat-card-content>
+    <mat-nav-list *ngIf="memberships">
+      <mat-list-item *ngFor="let ms of memberships">
+        <mat-icon matListIcon>group</mat-icon>
+
+        <span title="{{ms.groupDescription}}">{{ms.groupDisplayName}}</span>
+
+        <span style="flex: 1 1 auto;"></span>
+
+        <mat-icon style="margin-right:3em" title="Adminisztrátor" *ngIf="ms.isAdministrator">verified_user</mat-icon>
+        <button mat-mini-fab color="primary" (click)="editMembership(ms)">
+          <mat-icon>more_horiz</mat-icon>
+        </button>
+
+      </mat-list-item>
+    </mat-nav-list>
+    <span *ngIf="memberships && !memberships.length">Nem vagy tagja egy csoportnak sem</span>
+  </mat-card-content>
+  <mat-card-actions>
+      <button mat-raised-button color="primary" (click)="showCreateNewGroupDialog()">Új csoport létrehozása</button>
+  </mat-card-actions>
+</mat-card>
+
+<mat-card style="margin-top:1em;">
+  <mat-card-title>Meghívóim</mat-card-title>
+  <mat-card-content>
+    <mat-list *ngIf="invitations && invitations.length">
+      <mat-list-item *ngFor="let inv of invitations">
+        <mat-icon matListIcon>email</mat-icon>
+        <span title="{{inv.groupDescription}}">{{inv.groupDisplayName}}</span>
+        <span style="flex: 1 1 auto;"></span>
+        <button mat-mini-fab (click)="acceptInvitation(inv)" title="Elfogadás" color="primary">
+          <mat-icon>thumb_up</mat-icon>
+        </button>
+        <button mat-mini-fab style="margin-left:1em;" (click)="rejectInvitation(inv)" color="warning" title="Visszautasítás">
+          <mat-icon>thumb_down</mat-icon>
+        </button>
+
+      </mat-list-item>
+    </mat-list>
+    <span *ngIf="!invitations ||!invitations.length">
+      Nincsenek függőben lévő meghívásaid
+    </span>
+  </mat-card-content>
+</mat-card>
+
+
+<ng-template #newGroupDialogTemplate>
+  <h2 mat-dialog-title>Új csoport létrehozása</h2>
+  <mat-dialog-content>
+
+    <mat-form-field style="width:100%;">
+      <input matInput placeholder="Csoport neve" [(ngModel)]="newGroupName" name="newGroupName" id="newGroupName" required />
+      <mat-hint *ngIf="isNameReserved">Ez a név már foglalt</mat-hint>
+    </mat-form-field>
+    <br />
+    <mat-form-field style="width:100%;">
+      <input matInput placeholder="Leírás" [(ngModel)]="newGroupDescription" name="newGroupDescription" id="newGroupDescription" />
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button mat-dialog-close>Vissza</button>
+    <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+    <button mat-button *ngIf="existingGroupNames" [disabled]="!newGroupName || isNameReserved" (click)="createNewGroup()">Létrehozás</button>
+  </mat-dialog-actions>
+</ng-template>

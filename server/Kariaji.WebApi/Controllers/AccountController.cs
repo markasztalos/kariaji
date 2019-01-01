@@ -19,25 +19,20 @@ namespace Kariaji.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<UserInfo>> UpdateAccount([FromBody]UpdateMyAccountModel model)
+        public async Task<ActionResult<CompactUserInfo>> UpdateAccount([FromBody]UpdateMyAccountModel model)
         {
             if (!this.ModelState.IsValid)
                 return BadRequest(CommonResult.NewError());
 
             var user = await this.ugSvc.UpdateUserAccount(this.CurrentUser.Id, model.DisplayName);
-            return Ok(user.ToInfo());
+            return Ok(user.ToCompactInfo());
         }
 
         [HttpPut]
         [Route("password")]
         public async Task<ActionResult<CommonResult>> UpdatePassword([FromBody] UpdatePasswordModel model)
         {
-            if (string.IsNullOrEmpty(model.Password))
-            {
-                return BadRequest(CommonResult.NewError("Kötelező jelszót megadni"));
-            }
-
-            await this.ugSvc.UpdatePassword(this.CurrentUser.Id, model.Password);
+            await this.ugSvc.UpdatePasswordAsync(this.CurrentUser.Id, model.OldPassword, model.NewPassword);
 
             return Ok(CommonResult.NewSuccess());
         }
@@ -49,9 +44,9 @@ namespace Kariaji.WebApi.Controllers
         }
 
         [HttpGet]
-        public async Task<ActionResult<UserInfo>> GetMyAccount()
+        public async Task<ActionResult<CompactUserInfo>> GetMyAccount()
         {
-            return Ok(this.CurrentUser.ToInfo());
+            return Ok(this.CurrentUser.ToCompactInfo());
         }
     }
 }

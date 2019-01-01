@@ -37,5 +37,6 @@ namespace Kariaji.WebApi.DAL
         public DbSet<Configuration> Configurations { get; set; }
         public DbSet<Group> Groups { get; set; }
         public DbSet<Membership> Memberships { get; set; }
+        public DbSet<UserGroupInvitation> Invitations { get; set; }
     }
 }

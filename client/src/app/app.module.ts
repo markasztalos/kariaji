@@ -1,3 +1,9 @@
+import {MatSlideToggleModule} from '@angular/material/slide-toggle';
+
+import {MatButtonToggleModule} from '@angular/material/button-toggle';
+import {MatDialogModule} from '@angular/material/dialog';
+import {MatListModule} from '@angular/material/list';
+import {MatIconModule} from '@angular/material/icon';
 import {MatMenuModule} from '@angular/material/menu';
 import {MatSnackBarModule} from '@angular/material/snack-bar';
 import { NgReduxModule, NgRedux } from '@angular-redux/store';
@@ -28,6 +34,14 @@ import { kariajiReduxStore } from './store/app.store';
 import { MyAccountActions, MyAccountStateWrapperService } from './store/user-groups.redux';
 import { SettingsComponent } from './components/settings/settings.component';
 import { MyAccountApiService } from './services/my-account.service';
+import { GroupsEditorComponent } from './components/groups-editor/groups-editor.component';
+import { MyAccountComponent } from './components/my-account/my-account.component';
+import { UpdatePasswordComponent } from './components/update-password/update-password.component';
+import { UserGroupApiService } from './services/user-group-adi.service';
+import { GroupEditorComponent } from './components/groups-editor/group-editor.component';
+import { ConfirmDialogComponent } from './components/common/dialogs/confirm.component';
+import { KariajiDialogsService } from './services/dialogs.service';
+
 
 @NgModule({
   declarations: [
@@ -37,19 +51,30 @@ import { MyAccountApiService } from './services/my-account.service';
     LoginPageComponent,
     RegisterPageComponent,
     ConfirmRegistrationComponent,
-    SettingsComponent
+    SettingsComponent,
+    GroupsEditorComponent,
+    MyAccountComponent,
+    UpdatePasswordComponent,
+    GroupEditorComponent,
+    ConfirmDialogComponent,
+    
   ],
   imports: [
     MatInputModule,
     MatToolbarModule,
+    MatSlideToggleModule,
     BrowserModule,
+    MatListModule,
     MatSnackBarModule,
+    MatButtonToggleModule,
     MatMenuModule,
     FlexLayoutModule,
     MatButtonModule,
     BrowserAnimationsModule,
+    MatIconModule,
     AppRoutingModule,
     MatCardModule,
+    MatDialogModule,
     FontAwesomeModule,
     HttpClientModule,
     FormsModule,
@@ -62,10 +87,15 @@ import { MyAccountApiService } from './services/my-account.service';
   },
   MyAccountActions,
   MyAccountStateWrapperService,
-  MyAccountApiService
+  MyAccountApiService,
+  UserGroupApiService,
+  KariajiDialogsService
 
 ],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+  entryComponents: [
+    ConfirmDialogComponent
+  ]
 })
 export class AppModule {
   constructor(ngRedux: NgRedux<IKariajiAppState>) {

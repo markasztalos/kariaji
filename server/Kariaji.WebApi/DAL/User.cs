@@ -13,6 +13,8 @@ namespace Kariaji.WebApi.DAL
         public string Email { get; set; }
         public string Password { get; set; }
 
+        public bool IsDeleted { get; set; }
+
 
         public ICollection<Membership> Memberships { get; set; }
         

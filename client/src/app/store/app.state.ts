@@ -1,8 +1,9 @@
-import { User } from "../models/models";
+import { CompactUser } from "../models/models";
 
 export interface IKariajiAppState { 
-    __currentUser: User;
+    __currentUser: CompactUser;
     __currentUserCannotBeQueried : boolean;
+
 }
 
 export const initialAppState : IKariajiAppState = {

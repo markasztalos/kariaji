@@ -68,7 +68,7 @@ namespace Kariaji.WebApi.Services
 
             var user = new User
             {
-                Email = email,
+                Email = email.Trim(),
                 Password = this.protectionService.HashPassword(password)
 
             };

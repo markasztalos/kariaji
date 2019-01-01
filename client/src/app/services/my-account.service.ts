@@ -1,7 +1,7 @@
 import { Injectable } from "@angular/core";
 import { ApiBaseService } from "./api-base-service";
 import { HttpClient } from "@angular/common/http";
-import { User, UpdateMyAccountModel } from "../models/models";
+import { CompactUser, UpdateMyAccountModel } from "../models/models";
 import { Observable } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
 
@@ -9,12 +9,18 @@ import { MatSnackBar } from "@angular/material/snack-bar";
 export class MyAccountApiService extends ApiBaseService {
     constructor(http: HttpClient, snackBar: MatSnackBar) { super(http, snackBar); }
 
-    getMyAccount() : Observable<User> {
-        return this.http.get<User>(`${this.apiBaseUrl}/my-account`);
+    getMyAccount(): Observable<CompactUser> {
+        return this.get<CompactUser>(`/my-account`, { silentError: true });
     }
 
-    updateMyAccount(model : UpdateMyAccountModel) : Observable<User> {
-        return this.handleError(
-            this.http.put<User>(`${this.apiBaseUrl}/my-account`, model));
+    updateMyAccount(model: UpdateMyAccountModel): Observable<CompactUser> {
+        return this.put<CompactUser>(`/my-account`, model);
+    }
+
+    updatePassword(oldPassword: string, newPassword: string): Observable<any> {
+        return this.put(`/my-account/password`, {
+            newPassword,
+            oldPassword
+        });
     }
 }

@@ -38,6 +38,9 @@ namespace Kariaji.WebApi.DAL
         public Group Group { get; set; }
         public User InvitedUser { get; set; }
         public int? InvitedUserId { get; set; }
-        public string InvitedUserAddress { get; set; }
+        public User SenderUser { get;set; }
+        public int SenderUserId { get;set; }
+        public string InvitedEmail { get; set; }
+        public DateTime SendingDate { get; set; }
     }
 }

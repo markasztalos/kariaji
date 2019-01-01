@@ -1,0 +1,60 @@
+<ng-container *ngIf="group">
+  <mat-card>
+    <mat-card-title>
+      {{group.displayName}}
+    </mat-card-title>
+    <mat-card-content>
+      <mat-list>
+        <h3 matSubheader>Tagok</h3>
+        <mat-divider [inset]="true"></mat-divider>
+        <mat-list-item *ngFor="let member of group.members">
+          <mat-icon matListIcon>person</mat-icon>
+          {{member.user.displayName}}
+          <span style="flex: 1 1 auto;"></span>
+          <mat-icon style="margin-right:3em" title="Adminisztrátor" *ngIf="member.isAdministrator">verified_user</mat-icon>
+          <button mat-mini-fab color="primary" *ngIf="isAdministrator && member.user.id !== userId">
+            <mat-icon>more_horiz</mat-icon>
+          </button>
+        </mat-list-item>
+        <mat-list-item *ngIf="! group.members.length">
+          Nincsenek tagok
+        </mat-list-item>
+        <ng-container *ngIf="invitations">
+          <h3 matSubheader>Kiküldött mehívók</h3>
+          <mat-divider [inset]="true"></mat-divider>
+          <mat-list-item *ngFor="let inv of invitations">
+            <mat-icon matListIcon>email</mat-icon>
+            <span title="Elküldte {{inv.senderUser.displayName}} {{inv.sendingDate}}-kor"> {{inv.invitedUser.displayName}} ({{inv.invitedEmail}})</span>
+            <span style="flex: 1 1 auto;"></span>
+            <button mat-mini-fab (click)="deleteInvitation(inv)" color="warning" *ngIf="isAdministrator">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </mat-list-item>
+          <mat-list-item *ngIf="!invitations.length">
+            Nincsenek elfogadásra váró meghívók
+          </mat-list-item>
+          <mat-list-item>
+            <button *ngIf="isAdministrator" mat-raised-button color="accent" (click)="showInviteDialog()">Meghívás a csoportba</button>
+          </mat-list-item>
+        </ng-container>
+      </mat-list>
+    </mat-card-content>
+  </mat-card>
+</ng-container>
+
+
+<ng-template #inviteDialogTemplate>
+  <h2 mat-dialog-title>Meghívás a csoportba</h2>
+  <mat-dialog-content style="width:400px;">
+    <mat-form-field style="width:100%;">
+      <input matInput placeholder="Email cím" [(ngModel)]="inviteEmail" name="inviteEmail" id="inviteEmail" required />
+      <mat-hint *ngIf="inviteEmailDoesNotExist && !emailAlreadyInvited">Nincs ilyen email címmel regisztrált felhasználó</mat-hint>
+      <mat-hint *ngIf="emailAlreadyInvited">Ez a felhasználó már tagja a csoportnak</mat-hint>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button mat-dialog-close>Vissza</button>
+    <!-- The mat-dialog-close directive optionally accepts a value as a result for the dialog. -->
+    <button mat-button *ngIf="existingEmails" [disabled]="!inviteEmail || inviteEmailDoesNotExist || emailAlreadyInvited" (click)="invite()">Meghívás</button>
+  </mat-dialog-actions>
+</ng-template>

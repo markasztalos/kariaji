@@ -1,0 +1,15 @@
+<mat-card style="max-width:400px;">
+    <mat-card-title>Fiók beállítások</mat-card-title>
+    <mat-card-content>
+      <mat-form-field  style="width:100%">
+          <input matInput  id="displayName" name="displayName" type="text" placeholder="Megjelenített név" [(ngModel)]="displayName"/>
+      </mat-form-field>
+      <br />
+      <mat-form-field  style="width:100%">
+          <input matInput  id="email" name="email" type="email" placeholder="Email" [(ngModel)]="email" readonly/>
+      </mat-form-field>
+    </mat-card-content>
+    <mat-card-actions>
+      <button *ngIf="displayName" mat-raised-button color="primary" (click)="updateMyAccount()">Mentés</button>
+    </mat-card-actions>
+  </mat-card>
