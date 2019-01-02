@@ -48,6 +48,7 @@ import { AvatarsActions, AvatarsStateService } from './store/kariaji.store.publi
 import { UserAvatarComponent } from './components/common/user-avatar/user-avatar.component';
 import { MylistComponent } from './components/mylist/mylist.component';
 import { GiftsComponent } from './components/gifts/gifts.component';
+import { RichTextareaComponent } from './components/common/rich-textarea/rich-textarea.component';
 
 
 
@@ -69,6 +70,7 @@ import { GiftsComponent } from './components/gifts/gifts.component';
     UserAvatarComponent,
     MylistComponent,
     GiftsComponent,
+    RichTextareaComponent,
 
   ],
   imports: [
