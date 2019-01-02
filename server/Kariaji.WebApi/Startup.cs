@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Kariaji.WebApi.DAL;
+using Kariaji.WebApi.Helpers;
 using Kariaji.WebApi.Middlewares;
 using Kariaji.WebApi.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -133,6 +134,9 @@ namespace Kariaji.WebApi
                 {
                     context.Configurations.Add(defaultConfigurationProviderService.DefaultConfiguration);
                     context.SaveChanges();
+                    //demo data
+                    context.InitializeDemoData(serviceScope).Wait();
+
                 }
             }
         }

@@ -4,10 +4,11 @@ import { HttpClient } from "@angular/common/http";
 import { CompactUser, UpdateMyAccountModel } from "../models/models";
 import { Observable } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
+import { KariajiDialogsService } from "./dialogs.service";
 
 @Injectable()
 export class MyAccountApiService extends ApiBaseService {
-    constructor(http: HttpClient, snackBar: MatSnackBar) { super(http, snackBar); }
+    constructor(http: HttpClient, dialogs: KariajiDialogsService) { super(http, dialogs); }
 
     getMyAccount(): Observable<CompactUser> {
         return this.get<CompactUser>(`/my-account`, { silentError: true });
@@ -22,5 +23,16 @@ export class MyAccountApiService extends ApiBaseService {
             newPassword,
             oldPassword
         });
+    }
+
+    
+    updateOwnAvatar(file: File) : Observable<any>{
+        const formData = new FormData();
+        formData.append('image', file);
+        return this.put('my-account/avatar', formData);
+
+    }
+    deleteOwnAvatar() : Observable<any> {
+        return this.delete('my-account/avatar');
     }
 }

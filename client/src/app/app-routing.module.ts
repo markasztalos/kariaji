@@ -17,9 +17,11 @@ const routes: Routes = [
     path: '', component: MainComponent,
     canActivate: [AuthenticationService],
     children: [
-      { path: 'settings', component: SettingsComponent }
-      { path: 'groups', component: GroupsEditorComponent }
-      {path : 'group/:id', component: GroupEditorComponent}
+      { path: 'settings', component: SettingsComponent },
+      { path: 'groups', component: GroupsEditorComponent },
+      { path: 'group/:id', component: GroupEditorComponent },
+      { path: 'mylist', component: GroupEditorComponent },
+      { path: 'gifts', component: GroupEditorComponent }
     ]
   },
   { path: '**', component: LoginPageComponent },

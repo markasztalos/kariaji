@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { Router } from '@angular/router';
+import { NgStoreService } from 'src/app/store/kariaji.store.public';
 
 @Component({
   selector: 'kariaji-login',
@@ -9,9 +10,10 @@ import { Router } from '@angular/router';
 })
 export class LoginPageComponent implements OnInit {
 
-  constructor(private authSvc: AuthenticationService, private router : Router) { }
+  constructor(private storeSvc : NgStoreService, private authSvc: AuthenticationService, private router : Router) { }
 
   ngOnInit() {
+    this.storeSvc.resetAppState();
     this.authSvc.resetToken();
   }
 

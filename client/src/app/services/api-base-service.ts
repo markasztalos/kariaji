@@ -3,7 +3,8 @@ import { environment } from "src/environments/environment";
 import { Observable } from "rxjs";
 import { CommonResult } from "../models/common-results";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { share } from "rxjs/operators";
+import { share, map } from "rxjs/operators";
+import { KariajiDialogsService } from "./dialogs.service";
 
 export interface IApiConfig {
     handleError?: boolean;
@@ -15,7 +16,7 @@ const defaultApiConfig: IApiConfig = {
 };
 export class ApiBaseService {
     protected apiBaseUrl: string;
-    constructor(protected http: HttpClient, protected snackBar: MatSnackBar) {
+    constructor(protected http: HttpClient, protected dialogs: KariajiDialogsService) {
         this.apiBaseUrl = environment.siteBaseUrl + "api";
     }
 
@@ -24,10 +25,26 @@ export class ApiBaseService {
             const e = error.error as CommonResult;
             console.log(e);
             if (!silent && e.message) {
-                this.snackBar.open(e.message, "Rendben");
+                this.dialogs.toastSuccess(e.message);
             }
         });
         return query;
+    }
+
+    protected getBlob(urlPart: string, config: IApiConfig = {}): Observable<Blob> {
+        
+        if (urlPart && urlPart.startsWith("/"))
+            urlPart = urlPart.substr(1);
+        let o = this.http.get(`${this.apiBaseUrl}/${urlPart}`, {
+            responseType: 'blob',
+            observe: 'response'
+        }).pipe(share());
+        const c = { ...{ handleError: true, silentError: true }, ...config };
+        if (c.handleError) {
+            o = this.handleError(o, c.silentError);
+        }
+        
+        return o.pipe(map(response => response.body));
     }
 
     protected get<T = any>(urlPart: string, config: IApiConfig = {}): Observable<T> {
@@ -72,16 +89,16 @@ export class ApiBaseService {
     }
 }
 
-export function buildUrl(url: string, parameters : any)  : string{
+export function buildUrl(url: string, parameters: any): string {
     if (!url.endsWith("?"))
         url = url + "?";
     for (const prop in parameters) {
         const p = parameters[prop];
         if (p instanceof Array) {
-            for (const item of <[]>p) 
-                url += `${prop}=${item}`;
+            for (const item of <[]>p)
+                url += `&${prop}=${item}`;
         } else {
-            url += `${prop}=${p}`;
+            url += `&${prop}=${p}`;
         }
     }
     return url;

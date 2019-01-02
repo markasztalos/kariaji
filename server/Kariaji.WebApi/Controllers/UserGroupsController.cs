@@ -7,6 +7,7 @@ using Kariaji.WebApi.Middlewares;
 using Kariaji.WebApi.Models;
 using Kariaji.WebApi.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 // For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -143,8 +144,45 @@ namespace Kariaji.WebApi.Controllers
         }
 
 
+        [HttpGet]
+        [Route("user/{userId}/avatar")]
+        public  async Task<ActionResult> GetAvatar(int userId)
+        {
+            if (userId != CurrentUser.Id && (!(await this.ugSvc.AreUsersFriends(userId, CurrentUser.Id))))
+                throw KariajiException.NotAuthorized;
+            var avatar = await this.ugSvc.GetAvatarOfUserAsync(userId);
+            if (avatar != null)
+                return File(avatar.Data, avatar.ContentType);
+            else
+                return NoContent();
+        }
 
+        [HttpGet]
+        [Route("user/{userId}")]
+        public async Task<ActionResult<CompactUserInfo>> GetUser(int userId)
+        {
+            if (userId != CurrentUser.Id && (!(await this.ugSvc.AreUsersFriends(userId, CurrentUser.Id))))
+                throw KariajiException.NotAuthorized;
+            return Ok(this.ugSvc.GetUserById(userId).ToCompactInfo());
+        }
 
+        [HttpDelete]
+        [Route("memberships")]
+        public async Task DeleteMembership(int userId, int groupId)
+        {
+            if (!(await ugSvc.CanAdministerGroup(groupId, CurrentUser.Id)))
+                throw KariajiException.NotAuthorized;
 
+            await this.ugSvc.DeleteMembership(groupId, userId);
+        }
+
+        [HttpPut]
+        [Route("memberships")]
+        public async Task UpdateMembership([FromBody]UpdateMembershipModel model)
+        {
+            if (!(await ugSvc.CanAdministerGroup(model.GroupId, CurrentUser.Id)))
+                throw KariajiException.NotAuthorized;
+            await this.ugSvc.UpdateMembership(model.GroupId, model.UserId, model.IsAdministrator);
+        }
     }
 }

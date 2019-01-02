@@ -1,4 +1,6 @@
 import { Injectable } from "@angular/core";
+import * as Immutable from 'immutable';
+
 import { CompactUser } from "../models/models";
 import { IKariajiAppState, initialAppState } from "./app.state";
 import { NgRedux } from "@angular-redux/store";
@@ -7,9 +9,13 @@ import { createActionWithValue, extractActionValue, ActionWithValue } from "./st
 import { Observable, of } from "rxjs";
 import { MyAccountApiService } from "../services/my-account.service";
 import { filter, map, first } from "rxjs/operators";
+import { UserGroupApiService } from "../services/user-group-adi.service";
 
-const SET_CURRENT_USER = "current-user/set";
-const SET_CURRENT_USER_CANNOT_BE_QUERIED = "current-user-cannot-be-queried/set";
+const SET_CURRENT_USER = "current-user|set";
+const SET_CURRENT_USER_CANNOT_BE_QUERIED = "current-user-cannot-be-queried|set";
+
+const SET_USERS = 'users|set';
+const DELETE_USERS = 'users|delete';
 
 @Injectable()
 export class MyAccountActions {
@@ -17,7 +23,7 @@ export class MyAccountActions {
 
     public setCurrentUser(user: CompactUser) {
         this.ngRedux.dispatch(createActionWithValue(SET_CURRENT_USER, user));
-        if (user) 
+        if (user)
             this.ngRedux.dispatch(createActionWithValue(SET_CURRENT_USER_CANNOT_BE_QUERIED, true));
     }
     public setCurrentUserCannotBeQueried(value: boolean) {
@@ -39,9 +45,16 @@ export const currentUserCannotBeQueriedReducer: Reducer<boolean> = (state: boole
     }
 };
 
+
 @Injectable()
 export class MyAccountStateWrapperService {
     constructor(private ngRedux: NgRedux<IKariajiAppState>, private myAccountApiSvc: MyAccountApiService, private myAccountActions: MyAccountActions) { }
+
+    provideCurrentUser(): Observable<CompactUser> {
+        this.getCurrentUser();
+        // this.ngRedux.select(state => state.__currentUser).subscribe(x=> console.log(x));
+        return this.ngRedux.select(state => state.__currentUser);
+    }
 
     private currentUserQuery: Observable<CompactUser>;
     getCurrentUser(): Observable<CompactUser> {
@@ -68,3 +81,54 @@ export class MyAccountStateWrapperService {
             first());
     }
 }
+
+@Injectable()
+export class UsersStateService {
+    constructor(private ngRedux: NgRedux<IKariajiAppState>, private ugApi : UserGroupApiService) {
+
+    }
+    private setUsersInRedux(users: CompactUser[]) {
+        this.ngRedux.dispatch(createActionWithValue(SET_USERS, users));
+    }
+    private deleteUsersInRedux(userIds: number[]) {
+        this.ngRedux.dispatch(createActionWithValue(DELETE_USERS, userIds));
+    }
+    public invlidateUser(userId: number) {
+        this.deleteUsersInRedux([userId]);
+        this.ensureUser(userId);
+    }
+    public getUser$(userId: number) {
+        this.ensureUser(userId);
+        return this.ngRedux.select(state => state.__users.get(userId));
+    }
+    private pendingUserQueries : Set<number> = new Set();
+    private ensureUser(userId: number) {
+        if (!this.ngRedux.getState().__users.has(userId) && !this.pendingUserQueries.has(userId)) {
+            this.pendingUserQueries.add(userId);
+            const query = this.ugApi.getUser(userId);
+            query.subscribe(user => {
+                this.pendingUserQueries.delete(userId);
+                this.setUsersInRedux([user]);
+            });
+        }
+    }
+}
+
+
+
+export const usersReducer: Reducer<Immutable.Map<number, CompactUser>> = (state: Immutable.Map<number, CompactUser> = initialAppState.__users, action: ActionWithValue<CompactUser[] | number[]>): Immutable.Map<number, CompactUser> => {
+    switch (action.type) {
+        case SET_USERS: {
+            for (const user of <CompactUser[]>action.value)
+                state = state.set(user.id, user);
+            return state;
+        }
+        case DELETE_USERS: {
+            for (const userId of <number[]>action.value)
+                state = state.delete(userId);
+            return state;
+        }
+        default: return state;
+    }
+};
+

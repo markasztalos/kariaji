@@ -1,7 +1,9 @@
 <h2 mat-dialog-title>{{title}}</h2>
 <mat-dialog-content>
-  {{message}}
+  <span style="margin-bottom:1em">{{message}}</span>
+
+
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button mat-button *ngFor="let btn of customButtons" color="btn.color ? btn.color : 'basic'" mat-dialog-close="btn.action ? btn.action : btn.label">{{btn.label}}</button>
+  <button mat-raised-button *ngFor="let btn of customButtons" [color]="btn.color ? btn.color : 'basic'" [mat-dialog-close]="btn.action ? btn.action : btn.label">{{btn.label}}</button>
 </mat-dialog-actions>

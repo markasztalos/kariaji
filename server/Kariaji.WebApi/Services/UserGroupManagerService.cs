@@ -178,13 +178,19 @@ namespace Kariaji.WebApi.Services
                 throw KariajiException.NewPublic("Nincs jogosultságod ehhez a művelethez");
 
             this.ctx.Invitations.Remove(inv);
-            this.ctx.Memberships.Add(new Membership
-            {
-                UserId = currentUserId,
-                GroupId = inv.GroupId,
-                IsAdministrator = false,
-                IsDeleted = false
-            });
+
+            var deletedMembership = await ctx.Memberships.FirstOrDefaultAsync(m =>
+                m.UserId == currentUserId && m.GroupId == inv.GroupId && m.IsDeleted);
+            if (deletedMembership != null)
+                deletedMembership.IsDeleted = false;
+            else
+                this.ctx.Memberships.Add(new Membership
+                {
+                    UserId = currentUserId,
+                    GroupId = inv.GroupId,
+                    IsAdministrator = false,
+                    IsDeleted = false
+                });
             await this.ctx.SaveChangesAsync();
         }
 
@@ -199,6 +205,64 @@ namespace Kariaji.WebApi.Services
 
             this.ctx.Invitations.Remove(inv);
             await this.ctx.SaveChangesAsync();
+        }
+
+        public async Task<Avatar> GetAvatarOfUserAsync(int userId)
+        {
+            return await this.ctx.Avatars.FirstOrDefaultAsync(a => a.UserId == userId);
+        }
+
+        public async Task UpdateAvatarAsync(Avatar avatar)
+        {
+            var existingAvatar = await this.ctx.Avatars.FirstOrDefaultAsync(a => a.UserId == avatar.UserId);
+            if (existingAvatar == null)
+            {
+                this.ctx.Avatars.Add(avatar);
+            }
+            else
+            {
+                existingAvatar.Data = avatar.Data;
+                existingAvatar.ContentType = avatar.ContentType;
+            }
+
+            await ctx.SaveChangesAsync();
+        }
+
+        public async Task DeleteAvatar(int userId)
+        {
+            var existingAvatar = await this.ctx.Avatars.FirstOrDefaultAsync(a => a.UserId == userId);
+            if (existingAvatar != null)
+            {
+                this.ctx.Avatars.Remove(existingAvatar);
+            }
+
+            await this.ctx.SaveChangesAsync();
+        }
+
+        public async Task<bool> AreUsersFriends(int u1, int u2)
+        {
+            return await this.ctx.Groups.AnyAsync(g =>
+                g.Memberships.Any(m => !m.IsDeleted && m.UserId == u1) &&
+                g.Memberships.Any(m => !m.IsDeleted && m.UserId == u2));
+        }
+
+        public async Task<Membership> UpdateMembership(int groupId, int userId, bool isAdmin)
+        {
+            var membership = await ctx.Memberships.FirstOrDefaultAsync(m => m.GroupId == groupId && m.UserId == userId && !m.IsDeleted);
+            if (membership == null)
+                throw KariajiException.BadParamters;
+            membership.IsAdministrator = isAdmin;
+            await ctx.SaveChangesAsync();
+            return membership;
+        }
+
+        public async Task DeleteMembership(int groupId, int userId)
+        {
+            var membership = await ctx.Memberships.FirstOrDefaultAsync(m => m.GroupId == groupId && m.UserId == userId && !m.IsDeleted);
+            if (membership == null)
+                throw KariajiException.BadParamters;
+            membership.IsDeleted = true;
+            await ctx.SaveChangesAsync();
         }
 
 

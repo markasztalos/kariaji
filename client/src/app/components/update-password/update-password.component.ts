@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MyAccountApiService } from 'src/app/services/my-account.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { KariajiDialogsService } from 'src/app/services/dialogs.service';
 
 @Component({
   selector: 'kariaji-update-password',
@@ -9,7 +10,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class UpdatePasswordComponent implements OnInit {
 
-  constructor(private myAccountApi : MyAccountApiService, private snackBar: MatSnackBar) { }
+  constructor(private myAccountApi : MyAccountApiService, private dialogs: KariajiDialogsService) { }
 
   ngOnInit() {
   }
@@ -22,7 +23,7 @@ export class UpdatePasswordComponent implements OnInit {
 
   update() {
     this.myAccountApi.updatePassword(this.oldPassword, this.newPassword).subscribe(() => {
-      this.snackBar.open("Jelszó sikeresen frissítve", "Ok");
+      this.dialogs.toastSuccess("Jelszó sikeresen frissítve");
       this.oldPassword = this.newPassword = this.newPassword2 = '';
     }); 
   }

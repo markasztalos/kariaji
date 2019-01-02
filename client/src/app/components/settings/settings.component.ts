@@ -10,6 +10,8 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./settings.component.scss']
 })
 export class SettingsComponent implements OnInit {
+  ngOnInit(): void {
+  }
 
   
 

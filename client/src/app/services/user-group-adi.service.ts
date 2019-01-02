@@ -2,8 +2,9 @@ import { Injectable } from "@angular/core";
 import { ApiBaseService, buildUrl } from "./api-base-service";
 import { HttpClient } from "@angular/common/http";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { OwnMembership, CompactGroup, Group, UserGroupInvitation } from "../models/models";
+import { OwnMembership, CompactGroup, Group, UserGroupInvitation, CompactUser } from "../models/models";
 import { Observable } from "rxjs";
+import { KariajiDialogsService } from "./dialogs.service";
 
 @Injectable()
 export class UserGroupApiService extends ApiBaseService {
@@ -46,11 +47,26 @@ export class UserGroupApiService extends ApiBaseService {
         return this.get<string[]>(`/groups/names`);
     }
 
-    constructor(http: HttpClient, snackBar: MatSnackBar) {
-        super(http, snackBar);
+    constructor(http: HttpClient, dialogs: KariajiDialogsService) {
+        super(http, dialogs);
     }
 
     public getOwnMemberships(): Observable<OwnMembership[]> {
         return this.get<OwnMembership[]>(`/memberships`);
+    }
+
+    getAvatar(userId : number) : Observable<Blob> {
+        return this.getBlob(`user/${userId}/avatar`);
+    }
+
+    getUser(userId : number) : Observable<CompactUser> {
+        return this.get<CompactUser>(`user/${userId}`);
+    }
+
+    updateMembership(userId : number, groupId: number, isAdministrator : boolean) : Observable<any> {
+        return this.put(`memberships`, {userId, groupId, isAdministrator});
+    }
+    deleteMembership(userId: number, groupId: number) : Observable<any> {
+        return this.delete(buildUrl('memberships', {userId, groupId}));
     }
 }

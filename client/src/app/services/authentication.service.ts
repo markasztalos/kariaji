@@ -7,14 +7,15 @@ import { CanActivate, Router } from '@angular/router';
 import { MyAccountActions } from '../store/kariaji.store.public';
 import { ApiBaseService } from './api-base-service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { KariajiDialogsService } from './dialogs.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthenticationService extends ApiBaseService implements CanActivate {
 
-  constructor(http: HttpClient, public router: Router, snackBar: MatSnackBar) {
-    super(http, snackBar);
+  constructor(http: HttpClient, public router: Router, dialogs: KariajiDialogsService) {
+    super(http, dialogs);
   }
 
   public register(email: string): Observable<{ link: string }> {

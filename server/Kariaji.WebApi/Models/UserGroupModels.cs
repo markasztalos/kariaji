@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Kariaji.WebApi.DAL;
 using Kariaji.WebApi.Helpers;
+using Microsoft.AspNetCore.Http;
 
 namespace Kariaji.WebApi.Models
 {
@@ -119,5 +120,14 @@ namespace Kariaji.WebApi.Models
         public int GroupId { get; set; }
         public string Email { get; set; }
     }
+
+    public class UpdateMembershipModel
+    {
+        public int UserId { get; set; }
+        public int GroupId { get; set; }
+        public bool IsAdministrator { get; set; }
+    }
+
+ 
 
 }

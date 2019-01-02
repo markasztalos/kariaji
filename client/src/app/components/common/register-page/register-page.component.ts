@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { NgStoreService } from 'src/app/store/app.store';
 
 @Component({
   selector: 'kariaji-register-page',
@@ -8,12 +9,14 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 })
 export class RegisterPageComponent implements OnInit {
 
-  constructor(private authSvc : AuthenticationService) { }
+  constructor(private storeSvc: NgStoreService, private authSvc : AuthenticationService) { }
   email1: string = '';
   email2: string = '';
 
   ngOnInit() {
+    this.storeSvc.resetAppState();
     this.authSvc.resetToken();
+
   }
 
   link : string;

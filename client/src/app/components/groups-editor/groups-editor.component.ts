@@ -5,6 +5,7 @@ import { MatDialog, MatDialogRef } from '@angular/material/dialog';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
 import { Router } from '@angular/router';
+import { KariajiDialogsService } from 'src/app/services/dialogs.service';
 
 @Component({
   selector: 'kariaji-groups-editor',
@@ -13,7 +14,7 @@ import { Router } from '@angular/router';
 })
 export class GroupsEditorComponent implements OnInit {
 
-  constructor(private ugApi: UserGroupApiService, private dialogs: MatDialog, private snackBar: MatSnackBar, private router : Router) { }
+  constructor(private ugApi: UserGroupApiService, private dialogs: KariajiDialogsService, private router : Router) { }
 
   ngOnInit() {
     this.updateMemberships();
@@ -41,7 +42,7 @@ export class GroupsEditorComponent implements OnInit {
   showCreateNewGroupDialog() {
     this.ugApi.getExistingGroupNames().subscribe(list => {
       this.existingGroupNames = list.map(item => item.trim().toLowerCase());
-      this.createNewGroupDialog = this.dialogs.open(
+      this.createNewGroupDialog = this.dialogs.matDialogs.open(
         this.newGroupDialogTemplate
       );
     });
@@ -54,7 +55,7 @@ export class GroupsEditorComponent implements OnInit {
 
   createNewGroup() {
     this.ugApi.createNewGroup(this.newGroupName, this.newGroupDescription).subscribe(() => {
-      this.snackBar.open(`'${this.newGroupName}' nevű csoportot létrehoztuk`, "Ok");
+      this.dialogs.toastSuccess(`'${this.newGroupName}' nevű csoportot létrehoztuk`);
       this.newGroupName = '';
       this.newGroupDescription = '';
       this.updateMemberships();
@@ -74,13 +75,13 @@ export class GroupsEditorComponent implements OnInit {
       this.ugApi.acceptInvitation(inv.id).subscribe(() => {
         this.updateInvitations();
         this.updateMemberships();
-        this.snackBar.open("Hozzáadtunk a csoporthoz");
+        this.dialogs.toastSuccess("Hozzáadtunk a csoporthoz");
       });
   }
   rejectInvitation(inv: UserGroupInvitation) {
     this.ugApi.rejectInvitation(inv.id).subscribe(() => {
       this.updateInvitations();
-      this.snackBar.open("Meghívó törölve");
+      this.dialogs.toastSuccess("Meghívó törölve");
     });
 }
 }

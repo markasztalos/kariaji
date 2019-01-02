@@ -1,0 +1,19 @@
+<mat-card style="max-width: 400px;">
+  <mat-card-title>
+    Kép feltöltése
+  </mat-card-title>
+  <mat-card-content>
+
+
+    <input type="file" style="display:none;" #fileSelector (change)="onFileSelected($event)" accept=".png,.jpg" />
+
+    <ngx-avatar size="100" [src]="src" style="cursor: pointer" *ngIf="showAvatar" (clickOnAvatar)="onClicked($event)" name="{{displayName$ | async}}"></ngx-avatar>
+    <ngx-avatar size="100" [src]="src" style="cursor: pointer" *ngIf="showAvatarCopy" (clickOnAvatar)="onClicked($event)" name="{{displayName$ | async}}"></ngx-avatar>
+    <br />
+    <button mat-raised-button color="warn" *ngIf="src" (click)="deleteAvatar()">Kép törlése</button>
+
+  </mat-card-content>
+  <mat-card-actions>
+
+  </mat-card-actions>
+</mat-card>

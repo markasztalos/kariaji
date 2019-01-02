@@ -36,7 +36,7 @@
         <button mat-mini-fab (click)="acceptInvitation(inv)" title="Elfogadás" color="primary">
           <mat-icon>thumb_up</mat-icon>
         </button>
-        <button mat-mini-fab style="margin-left:1em;" (click)="rejectInvitation(inv)" color="warning" title="Visszautasítás">
+        <button mat-mini-fab style="margin-left:1em;" (click)="rejectInvitation(inv)" color="warn" title="Visszautasítás">
           <mat-icon>thumb_down</mat-icon>
         </button>
 
@@ -59,7 +59,7 @@
     </mat-form-field>
     <br />
     <mat-form-field style="width:100%;">
-      <input matInput placeholder="Leírás" [(ngModel)]="newGroupDescription" name="newGroupDescription" id="newGroupDescription" />
+      <textarea rows="4" style="min-width: 200px;" matInput placeholder="Leírás" [(ngModel)]="newGroupDescription" name="newGroupDescription" id="newGroupDescription"></textarea>
     </mat-form-field>
   </mat-dialog-content>
   <mat-dialog-actions>

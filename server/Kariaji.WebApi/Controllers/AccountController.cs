@@ -1,11 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Kariaji.WebApi.DAL;
 using Kariaji.WebApi.Models;
 using Kariaji.WebApi.Services;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Kariaji.WebApi.Controllers
@@ -47,6 +49,33 @@ namespace Kariaji.WebApi.Controllers
         public async Task<ActionResult<CompactUserInfo>> GetMyAccount()
         {
             return Ok(this.CurrentUser.ToCompactInfo());
+        }
+
+        [HttpPut]
+        [Route("avatar")]
+        public async Task<ActionResult> UpdateAvatar([FromForm] IFormFile image)
+        {
+            var avatar = new Avatar
+            {
+                UserId = CurrentUser.Id,
+                ContentType = image.ContentType
+            };
+            using (var memoryStream = new MemoryStream())
+            {
+                await image.CopyToAsync(memoryStream);
+                avatar.Data = memoryStream.ToArray();
+                
+            }
+            await this.ugSvc.UpdateAvatarAsync(avatar);
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("avatar")]
+        public async Task<ActionResult> DeleteAvatar()
+        {
+            await this.ugSvc.DeleteAvatar(CurrentUser.Id);
+            return Ok();
         }
     }
 }

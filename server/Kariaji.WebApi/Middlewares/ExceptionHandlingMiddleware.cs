@@ -13,6 +13,11 @@ namespace Kariaji.WebApi.Middlewares
 {
     public class KariajiException : Exception
     {
+        public static KariajiException NotAuthorized =>
+            KariajiException.NewPublic("Nincs jogosultságod ehhez a művelethez");
+        public static KariajiException BadParamters =>
+            KariajiException.NewPublic("Hibás kérés");
+
         public string LogMessage { get; set; }
         public string PublicMessage { get; set; }
 

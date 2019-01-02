@@ -1,20 +1,38 @@
 import { Injectable } from "@angular/core";
-import { MatDialog, MatDialogRef } from "@angular/material";
-import { IConfirmDialogConfig, ConfirmDialogComponent } from "../components/common/dialogs/confirm.component";
+import { ToastrService } from 'ngx-toastr';
+import { MatDialog, MatDialogRef, MatSnackBar, MatSnackBarConfig } from "@angular/material";
+import { IDialogConfig, DialogComponent } from "../components/common/dialogs/confirm.component";
 
+
+const toastOptions = {
+    closeButton: false,
+    progressBar: true,
+    positionClass: 'toast-top-center'
+};
 @Injectable()
 export class KariajiDialogsService {
-    constructor(private matDialogs: MatDialog) {
+    constructor(public matDialogs: MatDialog, private snackBar : MatSnackBar, public toastr: ToastrService ) {
 
     }
 
-    confirm(config : IConfirmDialogConfig) : MatDialogRef<any> {
+    showDialog(config : IDialogConfig) : MatDialogRef<any> {
         return this.matDialogs.open(
-            ConfirmDialogComponent,
+            DialogComponent,
             {
                 data: config
             }
         );
+    }
+
+
+
+    toastSuccess(message: string, title? : string) {
+        // this.snackBar.open(message, action, {
+        //     duration: 2000,
+        //     horizontalPosition: 'center',
+        //     verticalPosition: 'top'
+        // } as MatSnackBarConfig);
+        this.toastr.success(message, title, toastOptions);
     }
 
 }

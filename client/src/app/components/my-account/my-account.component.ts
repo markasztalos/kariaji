@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MyAccountStateWrapperService, MyAccountActions } from 'src/app/store/user-groups.redux';
 import { MyAccountApiService } from 'src/app/services/my-account.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { KariajiDialogsService } from 'src/app/services/dialogs.service';
 
 @Component({
   selector: 'kariaji-my-account',
@@ -10,7 +11,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 })
 export class MyAccountComponent implements OnInit {
 
-  constructor(private myAccountStateSvc: MyAccountStateWrapperService, private myAccountApi: MyAccountApiService, private myAccountActions : MyAccountActions, private snackBar: MatSnackBar) { }
+  constructor(private myAccountStateSvc: MyAccountStateWrapperService, private myAccountApi: MyAccountApiService, private myAccountActions : MyAccountActions, private dialogs: KariajiDialogsService) { }
 
   ngOnInit() {
     this.myAccountStateSvc.getCurrentUser().subscribe(u => {
@@ -30,7 +31,7 @@ export class MyAccountComponent implements OnInit {
       displayName: this.displayName
     }).subscribe(u => {
       this.myAccountActions.setCurrentUser(u);
-      this.snackBar.open("Felhasználói fiók frissítve", "Ok");
+      this.dialogs.toastSuccess("Fiók adatok frissítve");
     });
   }
 

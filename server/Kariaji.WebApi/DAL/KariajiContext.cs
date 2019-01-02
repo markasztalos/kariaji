@@ -38,5 +38,7 @@ namespace Kariaji.WebApi.DAL
         public DbSet<Group> Groups { get; set; }
         public DbSet<Membership> Memberships { get; set; }
         public DbSet<UserGroupInvitation> Invitations { get; set; }
+        public DbSet<Avatar> Avatars { get; set; }
+
     }
 }
