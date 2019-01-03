@@ -1,0 +1,65 @@
+<button mat-raised-button (click)="showDialog()" style="width:100%">Új ötlet</button>
+
+
+<ng-template #dialogTemplate>
+  <h2 mat-dialog-title style="min-width:400px;">
+    Új ötlet beküldése
+  </h2>
+  
+  <mat-dialog-content>
+    <h4>Leírás</h4>
+    <kariaji-rich-textarea></kariaji-rich-textarea>
+    <br />
+    <h4>Csoportok</h4>
+    <mat-divider style="margin-top:1em;margin-bottom:1em;"></mat-divider>
+    <div>
+      <button mat-mini-fab [matMenuTriggerFor]="addGroupMenu" title="Csoport hozzáadása" [disabled]="!addableGroups.length">
+        <mat-icon>group_add</mat-icon>
+      </button>
+      <mat-menu #addGroupMenu>
+        <button mat-menu-item *ngFor="let g of addableGroups" (click)="addGroup(g)">{{g.displayName}}</button>
+      </mat-menu>
+      <button color="warn" style="margin-left:.5em; padding-left:4px;padding-right:4px;margin-bottom:.5em;" mat-raised-button *ngFor="let g of groupsAdded" (click)="removeGroup(g)">
+        <!-- <mat-icon color="warn">delete</mat-icon> -->
+        {{g.displayName}}
+      </button>
+    </div>
+
+    <h4 style="margin-top:1em;">Címzettek</h4>
+    <mat-divider style="margin-top:1em;margin-bottom:1em;"></mat-divider>
+    <div>
+      <button mat-mini-fab [matMenuTriggerFor]="addTargetMenu" color="primary" [disabled]="!addableUsers.length">
+        <mat-icon>person_add</mat-icon>
+      </button>
+      <mat-menu #addTargetMenu>
+        <button mat-menu-item *ngFor="let u of addableUsers" (click)="addUser(u)">
+          <kariaji-user-avatar [userId]="u.id"></kariaji-user-avatar>
+        </button>
+      </mat-menu>
+      <button color="warn" mat-button *ngFor="let u of usersAdded" style="padding-left:4px; padding-right:4px;margin-left:.5em;margin-bottom:.5em;" (click)="removeUser(u)">
+        <kariaji-user-avatar [userId]="u.id"></kariaji-user-avatar>
+      </button>
+    </div>
+    <h4 style="margin-top:1em;">A címzetteken kívül nem láthatják még</h4>
+    <mat-divider style="margin-top:1em;margin-bottom:1em;"></mat-divider>
+    <div>
+      <button mat-mini-fab [matMenuTriggerFor]="addHiddenMenu" color="primary" [disabled]="!addableHiddenUsers.length">
+        <mat-icon>person_add</mat-icon>
+      </button>
+      <mat-menu #addHiddenMenu>
+        <button mat-menu-item *ngFor="let u of addableHiddenUsers" (click)="addHiddenUser(u)">
+          <kariaji-user-avatar [userId]="u.id"></kariaji-user-avatar>
+        </button>
+      </mat-menu>
+      <button color="warn" mat-button *ngFor="let u of addedHiddenUsers" style="padding-left:4px; padding-right:4px;margin-left:.5em;margin-bottom:.5em;" (click)="removeHiddenUser(u)">
+        <kariaji-user-avatar [userId]="u.id"></kariaji-user-avatar>
+      </button>
+    </div>
+    <br />
+  </mat-dialog-content>
+  <mat-dialog-actions>
+
+    <button mat-raised-button>Vissza</button>
+    <button mat-raised-button [disabled]="!usersAdded.length" color="primary" [mat-dialog-close]="true">Létrehozás</button>
+  </mat-dialog-actions>
+</ng-template>

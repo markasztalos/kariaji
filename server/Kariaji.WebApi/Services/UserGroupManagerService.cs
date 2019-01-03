@@ -266,6 +266,14 @@ namespace Kariaji.WebApi.Services
         }
 
 
+        public async Task<List<Group>> GetContainerGroupsAsync(int currentUserId)
+        {
+            return await this.ctx.Groups
+                .Include(g => g.Memberships)
+                .ThenInclude(m => m.User)
+                .Where(g => g.Memberships.Any(m => m.UserId == currentUserId && !m.IsDeleted))
+                .ToListAsync();
+        }
     }
 
 }

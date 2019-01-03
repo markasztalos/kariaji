@@ -6,6 +6,7 @@ import { MatSnackBar } from '@angular/material/snack-bar';
 import { stringToKeyValue } from '@angular/flex-layout/extended/typings/style/style-transforms';
 import { Router } from '@angular/router';
 import { KariajiDialogsService } from 'src/app/services/dialogs.service';
+import { ContainerGroupsStateService } from 'src/app/store/container-groups.redux';
 
 @Component({
   selector: 'kariaji-groups-editor',
@@ -14,7 +15,7 @@ import { KariajiDialogsService } from 'src/app/services/dialogs.service';
 })
 export class GroupsEditorComponent implements OnInit {
 
-  constructor(private ugApi: UserGroupApiService, private dialogs: KariajiDialogsService, private router : Router) { }
+  constructor(private ugApi: UserGroupApiService, private dialogs: KariajiDialogsService, private router : Router, private containerGroupsStateSvc : ContainerGroupsStateService) { }
 
   ngOnInit() {
     this.updateMemberships();
@@ -60,6 +61,8 @@ export class GroupsEditorComponent implements OnInit {
       this.newGroupDescription = '';
       this.updateMemberships();
       this.createNewGroupDialog.close();
+      this.containerGroupsStateSvc.invalidateContainerGroups();
+
 
     });
   }
@@ -76,6 +79,7 @@ export class GroupsEditorComponent implements OnInit {
         this.updateInvitations();
         this.updateMemberships();
         this.dialogs.toastSuccess("Hozzáadtunk a csoporthoz");
+        this.containerGroupsStateSvc.invalidateContainerGroups();
       });
   }
   rejectInvitation(inv: UserGroupInvitation) {

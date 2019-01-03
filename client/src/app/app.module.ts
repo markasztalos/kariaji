@@ -49,6 +49,8 @@ import { UserAvatarComponent } from './components/common/user-avatar/user-avatar
 import { MylistComponent } from './components/mylist/mylist.component';
 import { GiftsComponent } from './components/gifts/gifts.component';
 import { RichTextareaComponent } from './components/common/rich-textarea/rich-textarea.component';
+import { IdeaEditorComponent } from './components/mylist/idea-editor/idea-editor.component';
+import { ContainerGroupsStateService } from './store/container-groups.redux';
 
 
 
@@ -71,6 +73,7 @@ import { RichTextareaComponent } from './components/common/rich-textarea/rich-te
     MylistComponent,
     GiftsComponent,
     RichTextareaComponent,
+    IdeaEditorComponent,
 
   ],
   imports: [
@@ -109,7 +112,8 @@ import { RichTextareaComponent } from './components/common/rich-textarea/rich-te
     KariajiDialogsService,
     UsersStateService,
     NgStoreService,
-    AvatarsStateService
+    AvatarsStateService,
+    ContainerGroupsStateService
   ],
   bootstrap: [AppComponent],
   entryComponents: [

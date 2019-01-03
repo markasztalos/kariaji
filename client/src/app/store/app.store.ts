@@ -7,12 +7,14 @@ import { avatarsReducer } from "./avatars.redux";
 import { Injectable } from "@angular/core";
 import { NgRedux } from "@angular-redux/store";
 import { createAction } from "./store.common";
+import { containerGroupsReducer } from "./container-groups.redux";
 
 const rootReducer: Reducer<IKariajiAppState> = combineReducers<IKariajiAppState>({
     __currentUser: currentUserReducer,
     __currentUserCannotBeQueried: currentUserCannotBeQueriedReducer,
     __avatars: avatarsReducer,
-    __users: usersReducer
+    __users: usersReducer,
+    __containerGroups: containerGroupsReducer
 });
 
 const RESET_STORE = "store|reset";

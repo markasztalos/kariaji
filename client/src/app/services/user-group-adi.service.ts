@@ -69,4 +69,7 @@ export class UserGroupApiService extends ApiBaseService {
     deleteMembership(userId: number, groupId: number) : Observable<any> {
         return this.delete(buildUrl('memberships', {userId, groupId}));
     }
+    getContainerGroups() : Observable<Group[]> {
+        return this.get(`container-groups`);
+    }
 }

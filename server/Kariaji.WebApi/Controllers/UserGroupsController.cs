@@ -184,5 +184,13 @@ namespace Kariaji.WebApi.Controllers
                 throw KariajiException.NotAuthorized;
             await this.ugSvc.UpdateMembership(model.GroupId, model.UserId, model.IsAdministrator);
         }
+
+        [HttpGet]
+        [Route("container-groups")]
+        public async Task<List<GroupInfo>> GetContainerGroups()
+        {
+            var groups = await this.ugSvc.GetContainerGroupsAsync(CurrentUser.Id);
+            return groups.Select(g => g.ToInfo()).ToList();
+        }
     }
 }
