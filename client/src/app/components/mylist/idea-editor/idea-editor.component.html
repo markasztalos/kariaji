@@ -1,17 +1,16 @@
-<button mat-raised-button (click)="showDialog()" style="width:100%">Új ötlet</button>
-
-
-<ng-template #dialogTemplate>
-  <h2 mat-dialog-title style="min-width:400px;">
-    Új ötlet beküldése
-  </h2>
-  
-  <mat-dialog-content>
+<mat-card style="width:100%;">
+  <mat-card-title>Új ötlet beküldése</mat-card-title>
+  <mat-card-content>
     <h4>Leírás</h4>
-    <kariaji-rich-textarea></kariaji-rich-textarea>
+    <kariaji-rich-textarea #textEditor></kariaji-rich-textarea>
     <br />
-    <h4>Csoportok</h4>
-    <mat-divider style="margin-top:1em;margin-bottom:1em;"></mat-divider>
+      <h4 class="align-self-end">Csoportok
+        <button (click)="addAllGroups()" color="accent" mat-icon-button title="Összes csoport hozzáadása" [disabled]="!(addableGroups && addableGroups.length)">
+          <mat-icon>done_all</mat-icon>
+        </button>
+      </h4>
+    <mat-divider [inset]="true"></mat-divider>
+    <br />
     <div>
       <button mat-mini-fab [matMenuTriggerFor]="addGroupMenu" title="Csoport hozzáadása" [disabled]="!addableGroups.length">
         <mat-icon>group_add</mat-icon>
@@ -24,9 +23,14 @@
         {{g.displayName}}
       </button>
     </div>
-
-    <h4 style="margin-top:1em;">Címzettek</h4>
-    <mat-divider style="margin-top:1em;margin-bottom:1em;"></mat-divider>
+    <br />
+    <h4 >Címzettek
+      <button (click)="setMeAsOnlyTarget()" color="accent" mat-icon-button title="Csak nekem" [disabled]="!isSetMeAsOnlyTargetVisible">
+        <mat-icon>done</mat-icon>
+      </button>
+    </h4>
+    <mat-divider [inset]="true"></mat-divider>
+    <br />
     <div>
       <button mat-mini-fab [matMenuTriggerFor]="addTargetMenu" color="primary" [disabled]="!addableUsers.length">
         <mat-icon>person_add</mat-icon>
@@ -41,7 +45,8 @@
       </button>
     </div>
     <h4 style="margin-top:1em;">A címzetteken kívül nem láthatják még</h4>
-    <mat-divider style="margin-top:1em;margin-bottom:1em;"></mat-divider>
+    <mat-divider [inset]="true"></mat-divider>
+    <br />
     <div>
       <button mat-mini-fab [matMenuTriggerFor]="addHiddenMenu" color="primary" [disabled]="!addableHiddenUsers.length">
         <mat-icon>person_add</mat-icon>
@@ -56,10 +61,10 @@
       </button>
     </div>
     <br />
-  </mat-dialog-content>
-  <mat-dialog-actions>
+  </mat-card-content>
+  <mat-card-actions>
 
-    <button mat-raised-button>Vissza</button>
-    <button mat-raised-button [disabled]="!usersAdded.length" color="primary" [mat-dialog-close]="true">Létrehozás</button>
-  </mat-dialog-actions>
-</ng-template>
+    <button mat-raised-button (click)="cancel()">Vissza</button>
+    <button mat-raised-button (click)="create()" [disabled]="!usersAdded.length" color="primary">Létrehozás</button>
+  </mat-card-actions>
+</mat-card>

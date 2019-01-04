@@ -1,4 +1,9 @@
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+
+import {MatBadgeModule} from '@angular/material/badge';
+
+
+import {MatProgressSpinnerModule} from '@angular/material/progress-spinner';
 import { ToastrModule } from 'ngx-toastr';
 import { AvatarModule } from 'ngx-avatar';
 
@@ -44,13 +49,16 @@ import { GroupEditorComponent } from './components/groups-editor/group-editor.co
 import { DialogComponent } from './components/common/dialogs/confirm.component';
 import { KariajiDialogsService } from './services/dialogs.service';
 import { AvatarSelectorComponent } from './components/my-account/avatar-selector.component';
-import { AvatarsActions, AvatarsStateService } from './store/kariaji.store.public';
+import { AvatarsActions, AvatarsStateService, NewIdeaDialogStateWrapperService, IdeasListStateService } from './store/kariaji.store.public';
 import { UserAvatarComponent } from './components/common/user-avatar/user-avatar.component';
 import { MylistComponent } from './components/mylist/mylist.component';
 import { GiftsComponent } from './components/gifts/gifts.component';
 import { RichTextareaComponent } from './components/common/rich-textarea/rich-textarea.component';
 import { IdeaEditorComponent } from './components/mylist/idea-editor/idea-editor.component';
 import { ContainerGroupsStateService } from './store/container-groups.redux';
+import { IdeasApiService } from './services/ideas-api.service';
+import { IdeasListComponent } from './components/ideas/ideas-list/ideas-list.component';
+import { GroupAvatarComponent } from './components/common/group-avatar/group-avatar.component';
 
 
 
@@ -74,13 +82,17 @@ import { ContainerGroupsStateService } from './store/container-groups.redux';
     GiftsComponent,
     RichTextareaComponent,
     IdeaEditorComponent,
+    IdeasListComponent,
+    GroupAvatarComponent,
 
   ],
   imports: [
     MatInputModule,
     MatToolbarModule,
+    MatBadgeModule,
     MatSlideToggleModule,
     BrowserModule,
+    MatProgressSpinnerModule,
     ToastrModule.forRoot(),
     MatListModule,
     MatSnackBarModule,
@@ -113,7 +125,10 @@ import { ContainerGroupsStateService } from './store/container-groups.redux';
     UsersStateService,
     NgStoreService,
     AvatarsStateService,
-    ContainerGroupsStateService
+    ContainerGroupsStateService,
+    NewIdeaDialogStateWrapperService,
+    IdeasApiService,
+    IdeasListStateService
   ],
   bootstrap: [AppComponent],
   entryComponents: [

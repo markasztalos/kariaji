@@ -41,6 +41,9 @@ export class UserAvatarComponent implements OnInit, OnDestroy {
 
     }
   }
+  @Input()
+  size : number = 35;
+
   manuallyRefreshAvatarComponent() {
     this.showAvatar = false;
     setTimeout(() => this.showAvatar = true);

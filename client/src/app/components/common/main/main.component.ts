@@ -1,5 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild, TemplateRef } from '@angular/core';
 import { AuthenticationService } from 'src/app/services/authentication.service';
+import { KariajiDialogsService } from 'src/app/services/dialogs.service';
+import { NewIdeaDialogStateWrapperService } from 'src/app/store/new-idea-dialog.redux';
+import { select } from '@angular-redux/store';
+import { IKariajiAppState } from 'src/app/store/app.state';
+import { Observable } from 'rxjs';
+import { distinctUntilChanged } from 'rxjs/operators';
+import { MatDialogRef } from '@angular/material';
 
 
 @Component({
@@ -9,13 +16,34 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 })
 export class MainComponent implements OnInit {
 
-  constructor(private authSvc : AuthenticationService) { }
-  ngOnInit() {
+  constructor(private authSvc: AuthenticationService, private dialogs: KariajiDialogsService, private newIdeaStateSvc : NewIdeaDialogStateWrapperService) { }
+  ngOnInit() { 
 
+    this.isNewIdeaDialogShown$.subscribe(isShown => {
+      if (isShown && !this.dialog) {
+        this.showDialog();
+      } else if (!isShown && this.dialog) {
+        this.closeDialog();
+      }
+    });
   }
 
-  test() {
-    this.authSvc.test();
+  @ViewChild('newIdeaTemplate') newIdeaTemplate: TemplateRef<any>;
+
+  @select((state : IKariajiAppState) => state.isNewIdeaDialogShown) isNewIdeaDialogShown$ : Observable<boolean>;
+
+  dialog: MatDialogRef<any>;
+  showDialog() {
+    // this.dialog = this.dialogs.matDialogs.open(this.newIdeaTemplate, {
+    // });
+    // this.dialog.afterClosed().subscribe(()=> this.onNewIdeaEditingFinished());
+  }
+  closeDialog() {
+    // this.dialog.close();
+    // this.dialog = null;
   }
 
+  onNewIdeaEditingFinished() {
+    this.newIdeaStateSvc.setIsNewDialogShown(false);
+  }
 }

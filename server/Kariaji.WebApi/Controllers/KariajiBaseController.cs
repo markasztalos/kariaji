@@ -4,6 +4,7 @@ using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Kariaji.WebApi.DAL;
+using Kariaji.WebApi.Models;
 using Kariaji.WebApi.Services;
 using Microsoft.AspNetCore.DataProtection.XmlEncryption;
 using Microsoft.AspNetCore.Mvc;
@@ -33,6 +34,46 @@ namespace Kariaji.WebApi.Controllers
                 }
 
                 return _CurrentUser;
+            }
+        }
+
+ 
+        protected bool IsFriendUser(int userId)=> this.FriendUsers.Contains(userId);
+        protected bool IsFriendGroup(int groupId) => this.FriendGroups.Contains(groupId);
+
+        private HashSet<int> _FriendGroups;
+        private HashSet<int> _FriendUsers;
+
+        protected void InvalidateFriendUsersAndGroups()
+        {
+            this._FriendGroups = null;
+            this._FriendUsers = null;
+        }
+
+        private HashSet<int> FriendGroups
+        {
+            get
+            {
+                if (this._FriendGroups == null)
+                {
+                    this._FriendGroups = this.ugSvc.GetContainerGroupsAsync(CurrentUser.Id).Result.Select(g => g.Id).ToHashSet();
+                }
+
+                return _FriendGroups;
+            }
+        }
+
+        public HashSet<int> FriendUsers
+        {
+            get
+            {
+                if (this._FriendUsers == null)
+                {
+                    this._FriendUsers = this.ugSvc.GetContainerGroupsAsync(CurrentUser.Id).Result
+                        .SelectMany(g => g.Memberships.Where(m => !m.IsDeleted).Select(m => m.UserId)).ToHashSet();
+                }
+
+                return _FriendUsers;
             }
         }
     }

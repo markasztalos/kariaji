@@ -5,13 +5,18 @@ import { CompactUser, UpdateMyAccountModel } from "../models/models";
 import { Observable } from "rxjs";
 import { MatSnackBar } from "@angular/material/snack-bar";
 import { KariajiDialogsService } from "./dialogs.service";
+import { Router } from "@angular/router";
 
 @Injectable()
 export class MyAccountApiService extends ApiBaseService {
-    constructor(http: HttpClient, dialogs: KariajiDialogsService) { super(http, dialogs); }
+    constructor(http: HttpClient, dialogs: KariajiDialogsService, private router : Router) { super(http, dialogs); }
 
     getMyAccount(): Observable<CompactUser> {
-        return this.get<CompactUser>(`/my-account`, { silentError: true });
+        const o = this.get<CompactUser>(`/my-account`, { handleError: false });
+        o.subscribe(null, (err) => {
+            this.router.navigate(['/login']);
+        })
+        return o;
     }
 
     updateMyAccount(model: UpdateMyAccountModel): Observable<CompactUser> {

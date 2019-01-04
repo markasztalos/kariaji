@@ -18,5 +18,9 @@ namespace Kariaji.WebApi.DAL
 
         public ICollection<Membership> Memberships { get; set; }
         
+        public ICollection<IdeaUser> Ideas { get; set; }
+
+        public ICollection<IdeaComment> Comments { get; set; }
+        
     }
 }

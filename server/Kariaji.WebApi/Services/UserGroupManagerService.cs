@@ -148,6 +148,18 @@ namespace Kariaji.WebApi.Services
             return await this.ctx.Invitations.Include(i => i.Group).Include(i => i.SenderUser).Include(i => i.InvitedUser).Where(i => i.InvitedUser.Id == currentUserId).ToListAsync();
         }
 
+        public async Task<bool> IsMemberOfGroup(int groupId, int userId)
+        {
+            return await ctx.Groups.AnyAsync(g =>
+                g.Id == groupId && g.Memberships.Any(m => m.UserId == userId && !m.IsDeleted));
+        }
+        public async Task<bool> IsMemberOfGroups(IReadOnlyCollection<int> groupIds, int userId)
+        {
+            var gids = await ctx.Groups.Where(g =>
+                groupIds.Contains(g.Id) && g.Memberships.Any(m => m.UserId == userId && !m.IsDeleted)).Select(g=>g.Id).ToListAsync();
+            return gids.Count == groupIds.Count;
+        }
+
 
         public async Task<bool> CanAdministerGroup(int groupId, int userId)
         {

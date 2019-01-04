@@ -10,6 +10,10 @@ import { setClassOptions } from '@angular-redux/store/lib/src/decorators/helpers
   styleUrls: ['./rich-textarea.component.scss']
 })
 export class RichTextareaComponent implements OnInit {
+  
+  resetText(): any {
+    this.quill.setText('');
+  }
 
   constructor(private sanitizer: DomSanitizer) { }
 
@@ -45,6 +49,9 @@ export class RichTextareaComponent implements OnInit {
 
   public getContents(): string {
     return JSON.stringify(this.quill.getContents());
+  }
+  public getText() : string {
+    return this.quill.getText();
   }
 
   

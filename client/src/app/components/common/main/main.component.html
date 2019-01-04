@@ -1,10 +1,20 @@
-<kariaji-main-nav></kariaji-main-nav>
+<ng-container *ngIf="!(isNewIdeaDialogShown$ |async)">
+  <kariaji-main-nav></kariaji-main-nav>
 
-<div class="main">
-  <div class="container">
-    <router-outlet></router-outlet>
+  <div class="main">
+    <div class="container">
+      <router-outlet></router-outlet>
+    </div>
   </div>
+</ng-container>
+
+<div class="container" style="margin-top:1em;margin-bottom:1em;" *ngIf="(isNewIdeaDialogShown$ |async)">
+  <kariaji-idea-editor (finished)="onNewIdeaEditingFinished()"></kariaji-idea-editor>
+  <br />
 </div>
+
+
+
 <!-- 
 
 <main role="main" class="container">

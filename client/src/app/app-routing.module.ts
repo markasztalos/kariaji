@@ -10,6 +10,7 @@ import { GroupsEditorComponent } from './components/groups-editor/groups-editor.
 import { GroupEditorComponent } from './components/groups-editor/group-editor.component';
 import { MylistComponent } from './components/mylist/mylist.component';
 import { GiftsComponent } from './components/gifts/gifts.component';
+import { IdeasListComponent } from './components/ideas/ideas-list/ideas-list.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -22,8 +23,9 @@ const routes: Routes = [
       { path: 'settings', component: SettingsComponent },
       { path: 'groups', component: GroupsEditorComponent },
       { path: 'group/:id', component: GroupEditorComponent },
-      { path: 'mylist', component: MylistComponent },
-      { path: 'gifts', component: GiftsComponent }
+      // { path: 'mylist', component: MylistComponent },
+      { path: 'ideas', component: IdeasListComponent },
+      // { path: 'gifts', component: GiftsComponent }
     ]
   },
   { path: '**', component: LoginPageComponent },

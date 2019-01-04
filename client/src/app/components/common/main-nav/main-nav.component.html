@@ -17,8 +17,9 @@
         <mat-icon>notifications_off</mat-icon>
         <span>Disable alerts</span>
       </button> -->
-    <button color="primary" mat-menu-item [routerLink]="['/mylist']">Ajándékaim</button>
-    <button color="accent" mat-menu-item [routerLink]="['/gifts']">Adjádnéklisták</button>
+    <button mat-menu-item (click)="createNewIdea()">Új ötlet</button>
+    <button mat-menu-item [routerLink]="['/ideas']">Ötletek</button>
+    <!-- <button mat-menu-item [routerLink]="['/gifts']">Adjádnéklisták</button> -->
     <button mat-menu-item [routerLink]="['/groups']">Csoportok</button>
     <button mat-menu-item [routerLink]="['/settings']">Fiók</button>
     <button mat-menu-item [routerLink]="['/login']">Kilépés</button>

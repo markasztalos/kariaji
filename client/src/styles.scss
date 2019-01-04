@@ -114,3 +114,24 @@
     margin-left: 8px;
 }
   
+
+.group-avatar {
+  border-radius: .5em;
+  border-color: rgb(52, 152, 219);
+  background-color: rgb(52, 152, 219);
+  color:white;
+  padding: .5em;
+  padding-top:.3em;
+  padding-bottom:.3em;
+  user-select: none;
+  cursor: pointer;
+  word-wrap: none;
+}
+
+.user-text {
+  // border: 1px solid black;
+  p {
+    margin:0;
+    padding:0;
+  }
+}

@@ -102,6 +102,7 @@ namespace Kariaji.WebApi
             services.AddScoped(typeof(ConfigurationProviderService));
             services.AddScoped(typeof(ProtectionService));
             services.AddScoped(typeof(UserGroupManagerService));
+            services.AddScoped(typeof(IdeasManagerService));
 
 
         }

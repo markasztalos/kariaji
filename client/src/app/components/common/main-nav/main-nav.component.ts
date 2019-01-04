@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { faGift } from '@fortawesome/free-solid-svg-icons';
+import { NewIdeaDialogStateWrapperService } from 'src/app/store/new-idea-dialog.redux';
 
 
 @Component({
@@ -12,9 +13,11 @@ export class MainNavComponent implements OnInit {
   // icons
   public faGift = faGift;
 
-  constructor() { }
+  constructor(private newIdeaStateSvc : NewIdeaDialogStateWrapperService) { }
 
   ngOnInit() {
   }
-
+  createNewIdea() {
+    this.newIdeaStateSvc.setIsNewDialogShown(true);
+  }
 }

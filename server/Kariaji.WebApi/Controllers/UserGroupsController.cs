@@ -28,6 +28,7 @@ namespace Kariaji.WebApi.Controllers
         public async Task<ActionResult<List<Group>>> CreateGroup([FromBody] CreateNewGroupModel model)
         {
             var group = await this.ugSvc.CreateNewGroupAsync(model, CurrentUser.Id);
+            this.InvalidateFriendUsersAndGroups();
             return Ok(group.ToCompactInfo());
         }
 
@@ -172,7 +173,8 @@ namespace Kariaji.WebApi.Controllers
         {
             if (!(await ugSvc.CanAdministerGroup(groupId, CurrentUser.Id)))
                 throw KariajiException.NotAuthorized;
-
+            if (userId == this.CurrentUser.Id)
+                this.InvalidateFriendUsersAndGroups();
             await this.ugSvc.DeleteMembership(groupId, userId);
         }
 
@@ -192,5 +194,7 @@ namespace Kariaji.WebApi.Controllers
             var groups = await this.ugSvc.GetContainerGroupsAsync(CurrentUser.Id);
             return groups.Select(g => g.ToInfo()).ToList();
         }
+
+        
     }
 }

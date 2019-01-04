@@ -8,13 +8,19 @@ import { Injectable } from "@angular/core";
 import { NgRedux } from "@angular-redux/store";
 import { createAction } from "./store.common";
 import { containerGroupsReducer } from "./container-groups.redux";
+import { isNewIdeaDialogShownReducer } from "./new-idea-dialog.redux";
+import { ideasListReducer } from "./ideas-list.redux";
 
 const rootReducer: Reducer<IKariajiAppState> = combineReducers<IKariajiAppState>({
     __currentUser: currentUserReducer,
     __currentUserCannotBeQueried: currentUserCannotBeQueriedReducer,
     __avatars: avatarsReducer,
     __users: usersReducer,
-    __containerGroups: containerGroupsReducer
+    __containerGroups: containerGroupsReducer,
+    isNewIdeaDialogShown: isNewIdeaDialogShownReducer,
+    ideasListState: ideasListReducer
+
+    
 });
 
 const RESET_STORE = "store|reset";

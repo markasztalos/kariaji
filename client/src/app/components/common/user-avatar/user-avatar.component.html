@@ -1,4 +1,4 @@
 <span class="d-flex align-items-center" style="cursor: pointer" title="{{user.email}}" *ngIf="user">
-  <ngx-avatar size="40" *ngIf="showAvatar && (src || user && user.displayName)" [src]="src" [name]="user.displayName"></ngx-avatar>
+  <ngx-avatar [size]="size" *ngIf="showAvatar && (src || user && user.displayName)" [src]="src" [name]="user.displayName"></ngx-avatar>
   <span style="margin-left:4px;" *ngIf="user">{{user.displayName}}</span>
 </span>
