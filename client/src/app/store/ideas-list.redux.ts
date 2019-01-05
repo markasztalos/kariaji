@@ -28,7 +28,8 @@ export const ideasListReducer: Reducer<IIdeasListState> = (state = initialAppSta
     switch (action.type) {
         case SET_IDEAS: return {
             ...state,
-            ideas: extractActionValue<Idea[]>(action)
+            ideas: extractActionValue<Idea[]>(action),
+            detailedIdeaId: null
         };
         case SET_DETAILED_IDEA: return {
             ...state,

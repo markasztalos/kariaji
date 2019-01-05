@@ -7,8 +7,8 @@
 
     <input type="file" style="display:none;" #fileSelector (change)="onFileSelected($event)" accept=".png,.jpg" />
 
-    <ngx-avatar size="100" [src]="src" style="cursor: pointer" *ngIf="showAvatar" (clickOnAvatar)="onClicked($event)" name="{{displayName$ | async}}"></ngx-avatar>
-    <ngx-avatar size="100" [src]="src" style="cursor: pointer" *ngIf="showAvatarCopy" (clickOnAvatar)="onClicked($event)" name="{{displayName$ | async}}"></ngx-avatar>
+    <ngx-avatar size="100" [src]="src" style="cursor: pointer" *ngIf="showAvatar" (clickOnAvatar)="onClicked($event)" [name]="displayName$ | async"></ngx-avatar>
+    <ngx-avatar size="100" [src]="src" style="cursor: pointer" *ngIf="showAvatarCopy" (clickOnAvatar)="onClicked($event)" [name]="displayName$ | async"></ngx-avatar>
     <br />
     <button mat-raised-button color="warn" *ngIf="src" (click)="deleteAvatar()">Kép törlése</button>
 

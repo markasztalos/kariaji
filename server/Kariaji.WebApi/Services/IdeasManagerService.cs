@@ -285,5 +285,16 @@ namespace Kariaji.WebApi.Services
 
         }
 
+        public async Task<bool> CanUpdateTextDeltaOfIdea(int ideaId, int userId)
+        {
+            return await ctx.Ideas.AnyAsync(i => i.Id == ideaId && i.CreatorUserId == userId);
+        }
+        public async Task UpdateTextDeltaOfIdea(int ideaId, string textDelta)
+        {
+            var idea = await ctx.Ideas.FirstOrDefaultAsync(i => i.Id == ideaId);
+            idea.TextDelta = textDelta;
+            await this.ctx.SaveChangesAsync();
+        }
+
     }
 }

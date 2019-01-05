@@ -34,5 +34,13 @@ export class KariajiDialogsService {
         // } as MatSnackBarConfig);
         this.toastr.success(message, title, toastOptions);
     }
+    toastError(message: string, title? : string) {
+        // this.snackBar.open(message, action, {
+        //     duration: 2000,
+        //     horizontalPosition: 'center',
+        //     verticalPosition: 'top'
+        // } as MatSnackBarConfig);
+        this.toastr.error(message, title, toastOptions);
+    }
 
 }

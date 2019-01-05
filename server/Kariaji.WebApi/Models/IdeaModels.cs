@@ -101,9 +101,10 @@ namespace Kariaji.WebApi.Models
         public List<int> SecretUserIds { get; set; }
     }
 
-    public class CreateCommentModel
+    public class CreateTextDeltaModel
     {
         public string TextDelta { get; set; }
     }
+
 }
 

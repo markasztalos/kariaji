@@ -119,7 +119,7 @@ namespace Kariaji.WebApi.Controllers
 
         [HttpPost]
         [Route("idea/{ideaId}/comments")]
-        public async Task<ActionResult<IdeaCommentInfo>> CreateComment(int ideaId, [FromBody] CreateCommentModel model)
+        public async Task<ActionResult<IdeaCommentInfo>> CreateComment(int ideaId, [FromBody] CreateTextDeltaModel model)
         {
             if (!(await this.ideasSvc.CanCommentIdea(CurrentUser.Id, ideaId)))
                 throw KariajiException.NotAuthorized;
@@ -147,6 +147,17 @@ namespace Kariaji.WebApi.Controllers
                 throw KariajiException.NotAuthorized;
 
             await this.ideasSvc.UpdateGotIt(ideaId, gotIt);
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("idea/{ideaId}/text")]
+        public async Task<ActionResult> UpdateTextDeltaOfIdea(int ideaId, [FromBody] CreateTextDeltaModel model)
+        {
+            if (!(await this.ideasSvc.CanUpdateTextDeltaOfIdea(ideaId, CurrentUser.Id)))
+                throw KariajiException.NotAuthorized;
+
+            await ideasSvc.UpdateTextDeltaOfIdea(ideaId, model.TextDelta);
             return Ok();
         }
 

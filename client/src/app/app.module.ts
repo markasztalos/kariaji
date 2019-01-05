@@ -59,6 +59,7 @@ import { ContainerGroupsStateService } from './store/container-groups.redux';
 import { IdeasApiService } from './services/ideas-api.service';
 import { IdeasListComponent } from './components/ideas/ideas-list/ideas-list.component';
 import { GroupAvatarComponent } from './components/common/group-avatar/group-avatar.component';
+import { EditIdeaComponent } from './components/ideas/edit-idea/edit-idea.component';
 
 
 
@@ -84,6 +85,7 @@ import { GroupAvatarComponent } from './components/common/group-avatar/group-ava
     NewIdeaComponent,
     IdeasListComponent,
     GroupAvatarComponent,
+    EditIdeaComponent,
 
   ],
   imports: [

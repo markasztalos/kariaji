@@ -4,6 +4,9 @@ import { Subject, Observable, combineLatest, BehaviorSubject } from 'rxjs';
 import { combineReducers } from 'redux';
 import { map } from 'rxjs/operators';
 import { Group } from 'src/app/models/models';
+import { avatarColors } from '../user-avatar/user-avatar.component';
+
+
 
 @Component({
   selector: 'kariaji-group-avatar',
@@ -41,6 +44,24 @@ export class GroupAvatarComponent implements OnInit, OnDestroy {
     const containerGroups = values[1];
     return containerGroups ? containerGroups.find(cg => cg.id === groupId) : null;
   }));
-  name$ : Observable<string> = this.group$.pipe(map(g => g ? g.displayName : ''));
-  description$ : Observable<string> = this.group$.pipe(map(g => g ? g.description : ''));
+  name$: Observable<string> = this.group$.pipe(map(g => g ? g.displayName : ''));
+  description$: Observable<string> = this.group$.pipe(map(g => g ? g.description : ''));
+
+ 
+  @Input()
+  size:number = 35;
+
+  public getRandomColor(avatarText: string): string {
+    if (!avatarText) {
+      return "transparent";
+    }
+    const asciiCodeSum = this.calculateAsciiCode(avatarText);
+    return avatarColors[asciiCodeSum % avatarColors.length];
+  }
+  private calculateAsciiCode(value: string): number {
+    return value
+      .split("")
+      .map(letter => letter.charCodeAt(0))
+      .reduce((previous, current) => previous + current);
+  }
 }

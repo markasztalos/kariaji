@@ -26,7 +26,7 @@ export class IdeasApiService extends ApiBaseService {
         return this.get<CompactIdea[]>('own-ideas');
     }
 
-    public reserve(ideaId: number) : Observable<Reservation> {
+    public reserve(ideaId: number): Observable<Reservation> {
         return this.get(`idea/${ideaId}/reserve`);
 
     }
@@ -35,7 +35,7 @@ export class IdeasApiService extends ApiBaseService {
         return this.get(`reservation/${reservationId}/join`);
 
     }
-    public removeJoinReservation(reservationId: number, userId : number) {
+    public removeJoinReservation(reservationId: number, userId: number) {
         return this.delete(`reservation/${reservationId}/user/${userId}`);
 
     }
@@ -54,14 +54,18 @@ export class IdeasApiService extends ApiBaseService {
 
     }
 
-    public createComment(ideaId : number, textDelta : string) : Observable<IdeaComment> {
-        return this.post<IdeaComment>(`idea/${ideaId}/comments`, {textDelta});
+    public createComment(ideaId: number, textDelta: string): Observable<IdeaComment> {
+        return this.post<IdeaComment>(`idea/${ideaId}/comments`, { textDelta });
     }
-    public deleteComment(commentId : number) : Observable<any> {
+    public deleteComment(commentId: number): Observable<any> {
         return this.delete(`comment/${commentId}`);
     }
-    public updateGotIt(ideaId : number, gotIt: boolean) : Observable<any> {
+    public updateGotIt(ideaId: number, gotIt: boolean): Observable<any> {
         return this.get(`idea/${ideaId}/gotIt?gotIt=${gotIt}`);
+    }
+
+    public updateTextDeltaOfIdea(ideaId: number, textDelta: string): Observable<any> {
+        return this.put(`idea/${ideaId}/text`, { textDelta });
     }
 
 

@@ -3,9 +3,9 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { KariajiDialogsService } from 'src/app/services/dialogs.service';
 import { NewIdeaDialogStateWrapperService } from 'src/app/store/new-idea-dialog.redux';
 import { select } from '@angular-redux/store';
-import { IKariajiAppState } from 'src/app/store/app.state';
+import { IKariajiAppState, IIdeasListState } from 'src/app/store/app.state';
 import { Observable } from 'rxjs';
-import { distinctUntilChanged } from 'rxjs/operators';
+import { distinctUntilChanged, map } from 'rxjs/operators';
 import { MatDialogRef } from '@angular/material';
 
 
@@ -42,6 +42,11 @@ export class MainComponent implements OnInit {
     // this.dialog.close();
     // this.dialog = null;
   }
+
+  @select((state: IKariajiAppState) => state.ideasListState)
+  ideasListState$: Observable<IIdeasListState>;
+  detailedIdeaId$: Observable<number | null> = this.ideasListState$.pipe(map(state => state.detailedIdeaId));
+  showDetailedIdea$ : Observable<boolean> = this.detailedIdeaId$.pipe(map(id => id !== null));
 
   onNewIdeaEditingFinished() {
     this.newIdeaStateSvc.setIsNewDialogShown(false);

@@ -12,6 +12,7 @@ import { ContainerGroupsStateService } from 'src/app/store/container-groups.redu
 import { KariajiDialogsService } from 'src/app/services/dialogs.service';
 import { MyAccountStateWrapperService } from 'src/app/store/user-groups.redux';
 import { RichTextareaComponent } from '../../common/rich-textarea/rich-textarea.component';
+import { MatDialogRef } from '@angular/material';
 
 @Component({
   selector: 'kariaji-ideas-list',
@@ -55,12 +56,7 @@ export class IdeasListComponent implements OnInit, OnDestroy {
   containerGroups$: Observable<Group[]> = this.cotnainerGroupStateSvc.getContainerGroups$();
 
 
-  @ViewChild('ideaDetailsDialogTemplate') ideaDetailsDialogTemplate: TemplateRef<any>;
-  detailedIdea: Idea;
-  showDetailsOfIdea(idea: Idea) {
-    this.detailedIdea = idea;
-    this.dialogs.matDialogs.open(this.ideaDetailsDialogTemplate);
-  }
+
 
   deleteComment(idea: Idea, comment: IdeaComment) {
     this.ideasApi.deleteComment(comment.id).subscribe(() =>
@@ -69,19 +65,7 @@ export class IdeasListComponent implements OnInit, OnDestroy {
   }
 
 
-  sendComment() {
-    if (this.newCommentTextArea.getText().trim()) {
-      const newCommentDelta = this.newCommentTextArea.getContents();
-      this.ideasApi.createComment(this.detailedIdea.id, newCommentDelta).subscribe(newComment => {
-        if (!this.detailedIdea.comments)
-          this.detailedIdea.comments = [];
-        this.detailedIdea.comments.push(newComment);
-        this.newCommentTextArea.resetText();
-      });
-    }
-  }
 
-  @ViewChild('newCommentTextArea') newCommentTextArea: RichTextareaComponent;
 
   // getReservationButtonText(idea: Idea): string {
   //   if (!idea.isReserved) {
@@ -152,6 +136,29 @@ export class IdeasListComponent implements OnInit, OnDestroy {
     this.dialogs.matDialogs.open(this.joinedUsersDialogTemplate).afterClosed().subscribe(() => {
       this.detailedReservation = null;
     });
+  }
+  @ViewChild('newIdeaDialogTemplate') newIdeaDialogTemplate: TemplateRef<any>;
+  editIdeaDialog: MatDialogRef<any>;
+  detailedIdea: Idea;
+  showDetailsOfIdea(idea: Idea) {
+    this.detailedIdea = idea;
+    this.editIdeaDialog = this.dialogs.matDialogs.open(this.editIdeaDialogTemplate, { width: '800px' });
+  }
+  closeEditIdeaDialog() {
+    this.editIdeaDialog.close();
+    this.editIdeaDialog = null;
+    this.detailedIdea = null;
+  }
+
+
+  @ViewChild('editIdeaDialogTemplate') editIdeaDialogTemplate: TemplateRef<any>;
+  newIdeaDialog: MatDialogRef<any>;
+  showCreateNewIdea() {
+    this.newIdeaDialog = this.dialogs.matDialogs.open(this.newIdeaDialogTemplate, { width: '800px' });
+  }
+  closeNewIdeaDialog() {
+    this.newIdeaDialog.close();
+    this.newIdeaDialog = null;
   }
 
 }
