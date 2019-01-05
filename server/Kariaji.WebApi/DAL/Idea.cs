@@ -8,7 +8,7 @@ namespace Kariaji.WebApi.DAL
     public class Idea
     {
         public int Id { get; set; }
-        
+
         public int CreatorUserId { get; set; }
         public User CreatorUser { get; set; }
         public DateTime CreationTime { get; set; }
@@ -16,12 +16,14 @@ namespace Kariaji.WebApi.DAL
         public string TextDelta { get; set; }
 
         public ICollection<IdeaTargetGroup> TargetGroups { get; set; }
-        public ICollection<IdeaUser> Users { get;set; }
+        public ICollection<IdeaUser> Users { get; set; }
 
         public int? ReservationId { get; set; }
         public Reservation Reservation { get; set; }
 
         public ICollection<IdeaComment> Comments { get; set; }
+
+        public bool GotIt { get; set; }
     }
 
     public class IdeaTargetGroup

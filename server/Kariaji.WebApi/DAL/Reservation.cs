@@ -22,7 +22,6 @@ namespace Kariaji.WebApi.DAL
 
     public class ReservationJoin
     {
-        public int Id { get; set; }
         public int ReservationId { get; set; }
         public Reservation Reservation { get; set; }
         public int UserId { get; set; }

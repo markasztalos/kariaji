@@ -60,12 +60,12 @@ namespace Kariaji.WebApi.Controllers
 
         [HttpGet]
         [Route("idea/{ideaId}/reserve")]
-        public async Task<ActionResult> Reserve(int ideaId)
+        public async Task<ActionResult<ReservationInfo>> Reserve(int ideaId)
         {
             if (!(await this.ideasSvc.CanReserve(CurrentUser.Id, ideaId)))
                 throw KariajiException.NotAuthorized;
-            await this.ideasSvc.Reserve(CurrentUser.Id, ideaId);
-            return Ok();
+            var reservation = await this.ideasSvc.Reserve(CurrentUser.Id, ideaId);
+            return Ok(reservation.ToInfo());
         }
 
         [HttpGet]
@@ -78,12 +78,12 @@ namespace Kariaji.WebApi.Controllers
             return Ok();
         }
         [HttpDelete]
-        [Route("reservation-joins/{joinId}")]
-        public async Task<ActionResult> RemoveJoinReservation(int joinId)
+        [Route("reservation/{reservationId}/user/{userId}")]
+        public async Task<ActionResult> RemoveJoinReservation(int reservationId, int userId)
         {
-            if (!(await this.ideasSvc.CanRemoveJoin(joinId, CurrentUser.Id)))
+            if (!(await this.ideasSvc.CanRemoveJoin(reservationId, CurrentUser.Id, userId)))
                 throw KariajiException.NotAuthorized;
-            await this.ideasSvc.RemoveJoin(joinId);
+            await this.ideasSvc.RemoveJoin(reservationId, userId);
             return Ok();
         }
 
@@ -136,6 +136,17 @@ namespace Kariaji.WebApi.Controllers
                 throw KariajiException.NotAuthorized;
 
             await this.ideasSvc.DeleteComment(commentId);
+            return Ok();
+        }
+
+        [HttpGet]
+        [Route("idea/{ideaId}/gotIt")]
+        public async Task<ActionResult> UpdateGotIt(int ideaId, bool gotIt)
+        {
+            if (!(await this.ideasSvc.CanReserve(CurrentUser.Id, ideaId)))
+                throw KariajiException.NotAuthorized;
+
+            await this.ideasSvc.UpdateGotIt(ideaId, gotIt);
             return Ok();
         }
 

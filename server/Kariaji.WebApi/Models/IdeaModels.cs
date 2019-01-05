@@ -41,7 +41,7 @@ namespace Kariaji.WebApi.Models
             Id = reservation.Id,
             ReserverUserId = reservation.ReserverUserId,
             ReservationTime = reservation.ReservationTime.ToHungarianDateTime(),
-            JoinedUserIds = reservation.Joins.Select(j => j.UserId).ToList()
+            JoinedUserIds = reservation.Joins?.Select(j => j.UserId).ToList()
 
         };
 

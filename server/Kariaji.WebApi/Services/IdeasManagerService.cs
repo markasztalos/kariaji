@@ -83,6 +83,15 @@ namespace Kariaji.WebApi.Services
                 !i.ReservationId.HasValue
             );
         }
+        public async Task<bool> CanUpdateGotIt(int userId, int ideaId)
+        {
+            return await ctx.Ideas.AnyAsync(i =>
+                i.Id == ideaId &&
+                i.TargetGroups.Any(g =>
+                    g.Group.Memberships.Any(m => m.UserId == userId && !m.IsDeleted)) &&
+                i.Users.All(u => u.UserId != userId)
+            );
+        }
 
         public async Task<Reservation> Reserve(int userId, int ideaId)
         {
@@ -144,19 +153,19 @@ namespace Kariaji.WebApi.Services
             return join;
         }
 
-        public async Task<bool> CanRemoveJoin(int joinId, int userId)
+        public async Task<bool> CanRemoveJoin(int reservationId, int currentUserId, int removeUserId)
         {
             return await ctx.ReservationJoins.AnyAsync(j =>
-                j.Id == joinId &&
-                (j.UserId == userId ||
-                 j.Reservation.ReserverUserId == userId)
-            );
+                j.ReservationId == reservationId &&
+                (j.UserId == removeUserId &&
+                 (j.Reservation.ReserverUserId == currentUserId || currentUserId == removeUserId)));
+            
         }
 
-        public async Task RemoveJoin(int joinId)
+        public async Task RemoveJoin(int reservationId, int userId)
         {
-            //var join = await ctx.ReservationJoins.FirstOrDefaultAsync(j => j.Id == joinId);
-            ctx.ReservationJoins.Remove(new ReservationJoin { Id = joinId });
+            var join = await ctx.ReservationJoins.FirstOrDefaultAsync(j => j.ReservationId == reservationId && j.UserId == userId);
+            ctx.ReservationJoins.Remove(join);
             await ctx.SaveChangesAsync();
         }
 
@@ -172,12 +181,14 @@ namespace Kariaji.WebApi.Services
             return await ctx.Ideas
                 .Include(i => i.Reservation).ThenInclude(r => r.Joins)
                 .Include(i => i.TargetGroups).Include(i => i.Users)
+                .Include(i => i.Users)
                 .Include(i => i.Comments)
                 .Where(i =>
                     i.CreatorUserId == userId ||
-                    i.TargetGroups.Any(g => g.Group.Memberships.Any(m => m.UserId == userId && !m.IsDeleted)) &&
-                    i.Users.All(u => u.UserId != userId)
+                    (i.TargetGroups.Any(g => g.Group.Memberships.Any(m => m.UserId == userId && !m.IsDeleted)) &&
+                    i.Users.All(u => u.UserId != userId))
                 )
+                .OrderByDescending(i => i.CreationTime)
                 .ToListAsync();
         }
         
@@ -263,6 +274,15 @@ namespace Kariaji.WebApi.Services
         {
             ctx.IdeaComments.Remove(new IdeaComment { Id = commentId });
             await ctx.SaveChangesAsync();
+        }
+
+        public async Task UpdateGotIt(int ideaId, bool gotIt)
+        {
+            var idea = await ctx.Ideas.FirstOrDefaultAsync(i => i.Id == ideaId);
+            if (idea == null)
+                throw KariajiException.BadParamters;
+            idea.GotIt = gotIt;
+
         }
 
     }

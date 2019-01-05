@@ -2,21 +2,59 @@
   <mat-icon>refresh</mat-icon>
 </button>
 
-<mat-spinner *ngIf="!(ideas$ | async)"></mat-spinner>
+<mat-spinner style="margin-top:1em;" *ngIf="!(ideas$ | async)"></mat-spinner>
 <ng-container *ngFor="let idea of (ideas$ | async)">
   <mat-card style="margin-top: .8em;">
     <mat-card-content>
-      <!-- <span style="font-size:smaller;border-bottom:1px solid lightgray">{{idea.creationTime}}</span> -->
-      <div class="d-md-flex flex-row align-items-center">
-        <div class="d-flex flex-column" style="padding-right: 1em; border-right: 1px solid lightgray; " title="Címzettek">
-          <kariaji-user-avatar style="margin-top:4px;" [userId]="id" *ngFor="let id of idea.targetUserIds"></kariaji-user-avatar>
-        </div>
-        <!-- <mat-icon style="margin-top:4px;">drag_indicator</mat-icon> -->
-        <div style="margin-left:1em;margin-top:4px;" class="align-self-center flex-grow-1 user-text" [innerHtml]="getText(idea.textDelta)"></div>
-        <span style="font-size: smaller">{{idea.creationTime}}</span>
+      <div class="d-flex flex-row align-items-center" style="margin-left:1em" title="Címzettek">
+        EZ AZ ÖTLET NEKIK SZÓL:
+        <kariaji-user-avatar [size]="30" style="margin-left: 1em;" [userId]="id" *ngFor="let id of idea.targetUserIds"></kariaji-user-avatar>
+        <span class="flex-grow-1">&nbsp;</span>
+        <span class="badge badge-pill badge-secondary" style="font-size: normal">{{idea.creationTime}}</span>
         <button style="margin-left:1em;" color="accent" mat-mini-fab title="Részletek" (click)="showDetailsOfIdea(idea)">
           <mat-icon [matBadge]="idea.comments ? idea.comments.length : ''" [matBadgeHidden]="!idea.comments || !idea.comments.length" matBadgeColor="primary">info</mat-icon>
         </button>
+
+      </div>
+      <div style="margin-top:8px"></div>
+      <mat-divider [inset]="true"></mat-divider>
+      <div style="margin-top:8px"></div>
+      <!-- <span style="font-size:smaller;border-bottom:1px solid lightgray">{{idea.creationTime}}</span> -->
+      <div class="d-md-flex flex-row align-items-center">
+        <!-- <div class="d-flex flex-column" style="padding-right: 1em; border-right: 1px solid lightgray; " title="Címzettek">
+          <kariaji-user-avatar style="margin-top:4px;" [userId]="id" *ngFor="let id of idea.targetUserIds"></kariaji-user-avatar>
+        </div> -->
+        <!-- <mat-icon style="margin-top:4px;">drag_indicator</mat-icon> -->
+        <div style="margin-left:1em;margin-top:4px;" class="align-self-center flex-grow-1 user-text" [innerHtml]="getText(idea.textDelta)"></div>
+        <!-- <button style="margin-left:auto;" *ngIf="isReservationButtonVisible(idea)" [disabled]="isReservationButtonDisabled(idea)"  mat-raised-button>{{getReservationButtonText(idea)}}</button> -->
+
+        <div class="d-flex flex-column align-items-end">
+          <button *ngIf="canReserve(idea) && !idea.isReserved" mat-raised-button color="accent" (click)="reserve(idea)">Lefoglalom</button>
+          <button mat-button color="warn" *ngIf="canReserve(idea) && idea.isReserved && !idea.reservation">Más már lefoglalta</button>
+          <button *ngIf="canReserve(idea) && idea.reservation && idea.reservation && (idea.reservation.reserverUserId !== userId)" mat-button [matBadge]="idea.reservation.joinedUserIds ? idea.reservation.joinedUserIds.length : 0" [matBadgeHidden]="!idea.reservation.canJoin" (click)="idea.reservation.canJoin && showJoinedUsers(idea.reservation)">
+            <div class="d-flex flex-row">
+              <kariaji-user-avatar size="30" [userId]="idea.reservation.reserverUserId"></kariaji-user-avatar>
+              <span>&nbsp;már lefoglalta{{getTextIfCanJoinForOthersReservation(idea.reservation)}}</span>
+            </div>
+          </button>
+          <button mat-raised-button style="margin-top:1em;" *ngIf=" idea.reservation && idea.reservation.canJoin && (idea.reservation.reserverUserId !== userId) && !isUserJoined(idea.reservation)" (click)="join(idea.reservation)">
+            Csatlakozom
+          </button>
+          <button mat-raised-button *ngIf="idea.reservation && isUserJoined(idea.reservation)" (click)="removeJoin(idea.reservation, userId)">
+            Csatlakoztam, de visszalépek
+          </button>
+          <div *ngIf="canReserve(idea) && idea.reservation && (idea.reservation.reserverUserId === userId)" class="d-flex flex-column">
+            <button color="warn" mat-raised-button (click)="deleteReservation(idea)">
+              Visszavonom a foglalást
+            </button>
+            <mat-slide-toggle style="margin-top:1em" color="primary" [checked]="idea.reservation.canJoin" (change)="updateCanJoin(idea.reservation)">
+              Lehet csatlakozni?
+            </mat-slide-toggle>
+            <button style="margin-top:1em" mat-raised-button *ngIf="(idea.reservation.joinedUserIds && idea.reservation.joinedUserIds.length)" matBadge="{{idea.reservation.joinedUserIds ? idea.reservation.joinedUserIds.length : 0}}" (click)="showJoinedUsers(idea.reservation)">
+              Csatlakozások
+            </button>
+          </div>
+        </div>
       </div>
     </mat-card-content>
   </mat-card>
@@ -24,7 +62,7 @@
 
 <ng-template #ideaDetailsDialogTemplate>
   <h2 mat-dialog-title>Részletek</h2>
-  <mat-dialog-content style="min-width: 600px;">
+  <mat-dialog-content style="min-width: 700px;">
 
     <h4>Feladó</h4>
     <mat-divider></mat-divider>
@@ -40,7 +78,7 @@
     </div>
 
     <br />
-    <h4>Címzett(ek)</h4>
+    <h4>Címzett{{(detailedIdea.targetUserIds.length > 1) ? 'ek' : ''}}</h4>
     <mat-divider></mat-divider>
     <div class="d-flex align-items-center" style="margin-top:1em;">
       <kariaji-user-avatar style="margin-right:1em" [userId]="id" *ngFor="let id of detailedIdea.targetUserIds"></kariaji-user-avatar>
@@ -68,37 +106,113 @@
       <br />
     </ng-container>
 
+    <ng-container *ngIf="canReserve(detailedIdea) ">
+      <br />
+      <h4>Foglalás</h4>
+      <mat-divider></mat-divider>
+      <div style="margin-top:1em">
+        <div *ngIf="!detailedIdea.isReserved">Ez az ötlet még nincs lefoglalva</div>
+        <button style="margin-top:1em" *ngIf="!detailedIdea.isReserved" mat-raised-button color="accent" (click)="reserve(detailedIdea)">Lefoglalom</button>
+        <div *ngIf="detailedIdea.isReserved && !detailedIdea.reservation">Más már lefoglalta</div>
+        <ng-container *ngIf="detailedIdea.reservation && (detailedIdea.reservation.reserverUserId === userId)">
+          <div>Már lefoglaltad</div>
+
+          <mat-slide-toggle style="margin-top:1em" color="primary" [checked]="detailedIdea.reservation.canJoin" (change)="updateCanJoin(detailedIdea.reservation)">
+            Lehet csatlakozni?
+          </mat-slide-toggle>
+
+          <button mat-raised-button color="warn" (click)="deleteReservation(detailedIdea)">Foglalás törlése</button>
+        </ng-container>
+
+        <ng-container *ngIf="detailedIdea.reservation && (detailedIdea.reservation.reserverUserId !== userId)">
+          <div class="d-flex flex-row align-items-center">
+            <kariaji-user-avatar size="30" [userId]="detailedIdea.reservation.reserverUserId"></kariaji-user-avatar>
+            <span>&nbsp;már lefoglalta{{getTextIfCanJoinForOthersReservation(detailedIdea.reservation)}}</span>
+          </div>
+
+          <br />
+          <h4>Csatlakozások</h4>
+          <mat-divider></mat-divider>
+          <div style="margin-top:1em;" *ngIf="detailedIdea.reservation.reserverUserId !== userId" class="d-flex flex-row align-items-center">
+            <div *ngIf="detailedIdea.reservation.joinedUserIds && (detailedIdea.reservation.joinedUserIds.indexOf(userId)>=0)">Már csatlakoztál</div>
+
+            <button style="margin-left:1em;" mat-raised-button *ngIf="detailedIdea.reservation.joinedUserIds && (detailedIdea.reservation.joinedUserIds.indexOf(userId)>=0)" (click)="removeJoin(detailedIdea.reservation, userId)">Visszavonom a csatlakozást</button>
+
+
+
+            <div *ngIf="detailedIdea.reservation.joinedUserIds && (detailedIdea.reservation.joinedUserIds.indexOf(userId)<0)">Még nem csatlakoztál</div>
+
+            <button style="margin-left:1em;" *ngIf="detailedIdea.reservation.joinedUserIds && (detailedIdea.reservation.joinedUserIds.indexOf(userId)<0)" mat-raised-button (click)="join(detailedIdea.reservation)">Csatlakozom</button>
+
+          </div>
+          <div style="margin-top:1em;" class="d-flex flex-column" *ngIf="detailedIdea.reservation.joinedUserIds">
+            <div *ngFor="let joinedUserId of detailedIdea.reservation.joinedUserIds" class="d-flex flex-row">
+              <ng-container *ngIf="joinedUserId !== userId">
+                <kariaji-user-avatar [userId]="joinedUserId"> </kariaji-user-avatar>
+                <button mat-mini-fab style="margin-left:2em" color="warn" (click)="removeJoin(detailedIdea.reservation, joinedUserId)" *ngIf="(joinedUserId === userId) ||(userId === detailedIdea.reservation.reserverUserId)">
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </ng-container>
+            </div>
+          </div>
+        </ng-container>
+      </div>
+
+    </ng-container>
     <ng-container *ngIf="detailedIdea.comments">
       <br />
       <h4>Megjegyzések</h4>
       <mat-divider></mat-divider>
       <div style="margin-top:1em">
         <ng-container *ngFor="let comment of detailedIdea.comments">
-          <div class="d-flex flex-row" style="margin-left:1em;margin-top:1em">
+          <!-- <div class="d-flex flex-row" style="margin-left:1em;margin-top:1em">
             <span style="font-size:smaller;border-bottom:1px solid lightgray">{{comment.creationTime}}</span>
-          </div>
+          </div> -->
           <div style="margin-left: 1em" class="d-flex align-items-center" title="{{comment.creationTime}}">
             <kariaji-user-avatar style="padding-right:1em; border-right: 0px solid lightgray;" [userId]="comment.userId"></kariaji-user-avatar>
 
-            <div style="margin-left:1em" [innerHtml]="getText(comment.textDelta)" class="user-text align-self-center"></div>
-            <button *ngIf="comment.userId === (userId$ | async)" title="Törlés" mat-mini-fab color="warn" (click)="deleteComment(detailedIdea, comment)" style="margin-left:auto;">
+            <div style="margin-left:1em" [innerHtml]="getText(comment.textDelta)" class="user-text align-self-center flex-grow-1"></div>
+
+            <span class="badge badge-secondary">{{comment.creationTime}}</span>
+            <button *ngIf="comment.userId === (userId$ | async)" title="Törlés" mat-mini-fab color="warn" (click)="deleteComment(detailedIdea, comment)" style="margin-left:1em;">
               <mat-icon>delete</mat-icon>
             </button>
           </div>
         </ng-container>
+        <span *ngIf="!detailedIdea.comments.length">Nincsenek megjegyzések</span>
         <div style="margin-left:1em; margin-top:1em;" class="d-flex align-items-center">
           <kariaji-rich-textarea class="flex-grow-1" #newCommentTextArea></kariaji-rich-textarea>
           <button mat-mini-fab style="margin-left:1em;" color="primary" title="Küldés" (click)="sendComment()">
             <mat-icon>send</mat-icon>
           </button>
         </div>
-        <span *ngIf="!detailedIdea.comments.length">Nincsenek megjegyzések</span>
+
       </div>
     </ng-container>
     <br />
     <br />
   </mat-dialog-content>
   <mat-dialog-actions>
-    <button mat-button mat-dialog-close>Vissza</button>
+    <button mat-button mat-dialog-close>VISSZA</button>
+  </mat-dialog-actions>
+</ng-template>
+
+<ng-template #joinedUsersDialogTemplate>
+  <h2 mat-dialog-title>
+    {{(detailedReservation && detailedReservation.joinedUserIds && detailedReservation.joinedUserIds.length ) ? 'Eddig csatlakoztak' : 'Még nem csatlakozott senki'}}
+  </h2>
+  <mat-dialog-content *ngIf="detailedReservation">
+    <div class="d-flex flex-column">
+      <div *ngFor="let joinedUserId of detailedReservation.joinedUserIds" class="d-flex flex-row">
+        <kariaji-user-avatar [userId]="joinedUserId"> </kariaji-user-avatar>
+        <button mat-mini-fab style="margin-left:2em" color="warn" (click)="removeJoin(detailedReservation, joinedUserId)" *ngIf="(joinedUserId === userId) ||(userId === detailedReservation.reserverUserId)">
+          <mat-icon>delete</mat-icon>
+        </button>
+      </div>
+    </div>
+    <br />
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button mat-dialog-close>VISSZA</button>
   </mat-dialog-actions>
 </ng-template>

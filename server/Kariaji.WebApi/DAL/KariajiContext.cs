@@ -38,7 +38,7 @@ namespace Kariaji.WebApi.DAL
                 .WithMany(c => c.Users)
                 .HasForeignKey(bc => bc.IdeaId);
 
-            
+
             modelBuilder.Entity<IdeaTargetGroup>()
                 .HasKey(bc => new { bc.GroupId, bc.IdeaId });
             modelBuilder.Entity<IdeaTargetGroup>()
@@ -54,6 +54,9 @@ namespace Kariaji.WebApi.DAL
                 .HasOne(i => i.Reservation)
                 .WithOne(r => r.Idea)
                 .HasForeignKey<Reservation>(r => r.IdeaId);
+
+            modelBuilder.Entity<ReservationJoin>()
+                .HasKey(j => new { j.ReservationId, j.UserId });
 
 
             modelBuilder.WithDisabledCascadeDeleteOnForeignKeys();

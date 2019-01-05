@@ -2,7 +2,7 @@ import { Inject, Injectable } from "@angular/core";
 import { ApiBaseService } from "./api-base-service";
 import { HttpClient } from "@angular/common/http";
 import { KariajiDialogsService } from "./dialogs.service";
-import { CreateIdeaModel, CompactIdea, Idea, IdeaComment } from "../models/models";
+import { CreateIdeaModel, CompactIdea, Idea, IdeaComment, Reservation } from "../models/models";
 import { Observable } from "rxjs";
 
 @Injectable()
@@ -26,7 +26,7 @@ export class IdeasApiService extends ApiBaseService {
         return this.get<CompactIdea[]>('own-ideas');
     }
 
-    public reserve(ideaId: number) {
+    public reserve(ideaId: number) : Observable<Reservation> {
         return this.get(`idea/${ideaId}/reserve`);
 
     }
@@ -35,13 +35,13 @@ export class IdeasApiService extends ApiBaseService {
         return this.get(`reservation/${reservationId}/join`);
 
     }
-    public removeJoinReservation(joinId: number) {
-        return this.delete(`reservation-joins/${joinId}`);
+    public removeJoinReservation(reservationId: number, userId : number) {
+        return this.delete(`reservation/${reservationId}/user/${userId}`);
 
     }
 
     public updateIfCanJoinToReservation(reservationId: number, canJoin: boolean) {
-        return this.get(`reservation/${reservationId}/update-can-join`);
+        return this.get(`reservation/${reservationId}/update-can-join?canJoin=${canJoin}`);
     }
 
     public deleteReservation(reservationId: number) {
@@ -59,7 +59,9 @@ export class IdeasApiService extends ApiBaseService {
     }
     public deleteComment(commentId : number) : Observable<any> {
         return this.delete(`comment/${commentId}`);
-
+    }
+    public updateGotIt(ideaId : number, gotIt: boolean) : Observable<any> {
+        return this.get(`idea/${ideaId}/gotIt?gotIt=${gotIt}`);
     }
 
 
