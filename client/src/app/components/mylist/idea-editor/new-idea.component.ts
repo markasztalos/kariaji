@@ -66,7 +66,7 @@ export class NewIdeaComponent implements OnInit, OnDestroy {
     this.groupsAdded.push(g);
   }
   removeGroup(g: Group) {
-    this.groupsAdded.splice(this.addableGroups.indexOf(g), 1);
+    this.groupsAdded.splice(this.groupsAdded.indexOf(g), 1);
     const addableUsers = this.groupsAdded.mapMany(g => g.members.map(m => m.user)).distinctBy(u => u.id);
     this.usersAdded = this.usersAdded.filter(u => addableUsers.indexOf(u) >= 0);
     this.addedHiddenUsers = this.addedHiddenUsers.filter(u => addableUsers.indexOf(u) >= 0);

@@ -1,4 +1,5 @@
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import {MatTooltipModule} from '@angular/material/tooltip';
 
 import {MatBadgeModule} from '@angular/material/badge';
 
@@ -109,6 +110,7 @@ import { EditIdeaComponent } from './components/ideas/edit-idea/edit-idea.compon
     MatCardModule,
     MatDialogModule,
     FontAwesomeModule,
+    MatTooltipModule,
     HttpClientModule,
     FormsModule,
     NgReduxModule

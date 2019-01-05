@@ -7,8 +7,8 @@
 <ng-container *ngFor="let idea of (ideas$ | async)">
   <mat-card style="margin-top: .8em;">
     <mat-card-content>
-      <div class="d-flex flex-row align-items-center" style="margin-left:1em">
-        Ez az ötlet nekik szól:
+      <div class="d-flex flex-row align-items-center" >
+        <!-- Ez az ötlet nekik szól: -->
         <kariaji-user-avatar [size]="30" style="margin-left: 3px;" [userId]="id" *ngFor="let id of idea.targetUserIds"></kariaji-user-avatar>
         <span class="flex-grow-1">&nbsp;</span>
         <span class="badge badge-pill badge-secondary" style="font-size: normal">{{idea.creationTime}}</span>
@@ -33,7 +33,7 @@
           <button *ngIf="canReserve(idea) && !idea.isReserved" mat-raised-button color="accent" (click)="reserve(idea)">Lefoglalom</button>
           <button mat-button color="warn" *ngIf="canReserve(idea) && idea.isReserved && !idea.reservation">Más már lefoglalta</button>
           <button *ngIf="canReserve(idea) && idea.reservation && idea.reservation && (idea.reservation.reserverUserId !== userId)" mat-button [matBadge]="idea.reservation.joinedUserIds ? idea.reservation.joinedUserIds.length : 0" [matBadgeHidden]="!idea.reservation.canJoin" (click)="idea.reservation.canJoin && showJoinedUsers(idea.reservation)">
-            <div class="d-flex flex-row">
+            <div class="d-flex flex-row align-items-center">
               <kariaji-user-avatar size="30" [userId]="idea.reservation.reserverUserId"></kariaji-user-avatar>
               <span>&nbsp;már lefoglalta{{getTextIfCanJoinForOthersReservation(idea.reservation)}}</span>
             </div>
