@@ -12,6 +12,7 @@ export interface IKariajiAppState {
 }
 export interface IIdeasListState {
     ideas : Idea[];
+    detailedIdeaId : number | null;
 }
 
 export const initialAppState : IKariajiAppState = {
@@ -22,6 +23,7 @@ export const initialAppState : IKariajiAppState = {
     __containerGroups : null,
     isNewIdeaDialogShown : false,
     ideasListState : {
-        ideas : null
+        ideas : null,
+        detailedIdeaId : null
     }
 };

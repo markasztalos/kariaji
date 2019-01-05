@@ -9,11 +9,11 @@ import { IdeasApiService } from 'src/app/services/ideas-api.service';
 import { RichTextareaComponent } from '../../common/rich-textarea/rich-textarea.component';
 
 @Component({
-  selector: 'kariaji-idea-editor',
-  templateUrl: './idea-editor.component.html',
-  styleUrls: ['./idea-editor.component.scss']
+  selector: 'kariaji-new-idea',
+  templateUrl: './new-idea.component.html',
+  styleUrls: ['./new-idea.component.scss']
 })
-export class IdeaEditorComponent implements OnInit, OnDestroy {
+export class NewIdeaComponent implements OnInit, OnDestroy {
   ngUnsubscribe = new Subject();
   ngOnDestroy(): void {
     this.ngUnsubscribe.next();

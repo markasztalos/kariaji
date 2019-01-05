@@ -54,7 +54,7 @@ import { UserAvatarComponent } from './components/common/user-avatar/user-avatar
 import { MylistComponent } from './components/mylist/mylist.component';
 import { GiftsComponent } from './components/gifts/gifts.component';
 import { RichTextareaComponent } from './components/common/rich-textarea/rich-textarea.component';
-import { IdeaEditorComponent } from './components/mylist/idea-editor/idea-editor.component';
+import { NewIdeaComponent } from './components/mylist/idea-editor/new-idea.component';
 import { ContainerGroupsStateService } from './store/container-groups.redux';
 import { IdeasApiService } from './services/ideas-api.service';
 import { IdeasListComponent } from './components/ideas/ideas-list/ideas-list.component';
@@ -81,7 +81,7 @@ import { GroupAvatarComponent } from './components/common/group-avatar/group-ava
     MylistComponent,
     GiftsComponent,
     RichTextareaComponent,
-    IdeaEditorComponent,
+    NewIdeaComponent,
     IdeasListComponent,
     GroupAvatarComponent,
 
