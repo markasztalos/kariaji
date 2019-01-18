@@ -29,7 +29,7 @@ namespace Kariaji.WebApi.Controllers
                     var nameIdClaimValue = this.User.Claims.FirstOrDefault(c => c.Type == ClaimTypes.NameIdentifier)?.Value;
                     if (nameIdClaimValue != null && int.TryParse(nameIdClaimValue, out int id))
                     {
-                        this._CurrentUser = this.ugSvc.GetUserById(id);
+                        this._CurrentUser = this.ugSvc.GetUserById(id).Result;
                     }
                 }
 
@@ -37,44 +37,68 @@ namespace Kariaji.WebApi.Controllers
             }
         }
 
- 
-        protected bool IsFriendUser(int userId)=> this.FriendUsers.Contains(userId);
-        protected bool IsFriendGroup(int groupId) => this.FriendGroups.Contains(groupId);
 
-        private HashSet<int> _FriendGroups;
-        private HashSet<int> _FriendUsers;
+        protected bool IsFriendUser(int userId) => this.FriendUserIds.Contains(userId);
+        protected bool IsFriendGroup(int groupId) => this.FriendGroupIds.Contains(groupId);
+
+        private HashSet<int> _FriendUsersIds;
+
+        public HashSet<int> FriendUserIds
+        {
+            get
+            {
+                if (_FriendUsersIds == null)
+                    _FriendUsersIds = this.ugSvc.GetFriendUserIds(CurrentUser.Id).Result.ToHashSet();
+                return _FriendUsersIds;
+            }
+        }
 
         protected void InvalidateFriendUsersAndGroups()
         {
-            this._FriendGroups = null;
-            this._FriendUsers = null;
+            this._FriendGroupsIds = null;
+            this._FriendUsersIds = null;
         }
 
-        private HashSet<int> FriendGroups
+        private HashSet<int> _FriendGroupsIds = null;
+
+        public HashSet<int> FriendGroupIds
         {
             get
             {
-                if (this._FriendGroups == null)
-                {
-                    this._FriendGroups = this.ugSvc.GetContainerGroupsAsync(CurrentUser.Id).Result.Select(g => g.Id).ToHashSet();
-                }
-
-                return _FriendGroups;
+                if (_FriendGroupsIds == null)
+                    _FriendGroupsIds = this.ugSvc.GetContainerGroupIdsAsync(this.CurrentUser.Id).Result.ToHashSet();
+                return _FriendGroupsIds;
             }
         }
 
-        public HashSet<int> FriendUsers
-        {
-            get
-            {
-                if (this._FriendUsers == null)
-                {
-                    this._FriendUsers = this.ugSvc.GetContainerGroupsAsync(CurrentUser.Id).Result
-                        .SelectMany(g => g.Memberships.Where(m => !m.IsDeleted).Select(m => m.UserId)).ToHashSet();
-                }
+        //public Dictionary<int, GroupInfo> FriendGroups
+        //{
+        //    get
+        //    {
+        //        if (this._FriendGroups == null)
+        //        {
+        //            this._FriendGroups = this.ugSvc.GetContainerGroupsAsync(CurrentUser.Id).Result
+        //                .ToDictionary(g => g.Id, g => g.ToInfo());
+        //        }
 
-                return _FriendUsers;
-            }
-        }
+        //        return _FriendGroups;
+        //    }
+        //}
+
+        //public Dictionary<int, (CompactUserInfo user, Avatar avatar)> FriendUsers
+        //{
+        //    get
+        //    {
+        //        if (this._FriendUsers == null)
+        //        {
+        //            var friends = this.ugSvc.GetFriendUsers(CurrentUser.Id).Result;
+        //            this._FriendUsers = friends.ToDictionary(u => u.Id, u => (u.ToCompactInfo(), u.Avatar));
+        //        }
+
+        //        return _FriendUsers;
+        //    }
+        //}
+
+
     }
 }

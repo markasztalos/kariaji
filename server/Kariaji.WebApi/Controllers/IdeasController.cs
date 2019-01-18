@@ -41,14 +41,30 @@ namespace Kariaji.WebApi.Controllers
 
         [HttpGet]
         [Route("ideas")]
-        public async Task<ActionResult<List<IdeaInfo>>> GetVisibleIdeas()
+        public async Task<ActionResult<PagedIdeasQueryResult>> GetVisibleIdeas(
+            [FromQuery] List<int> filteredTargetGroupIds = null, [FromQuery] List<int> filteredTargetUserIds = null,
+            bool onlyNotReserved = false, bool onlyReservedByMe = false, bool onlySentByMe = false, int skip = 0, int take = 20)
         {
-            return (await this.ideasSvc.GetVisibleIdeas(CurrentUser.Id)).Select(i => (i.ToInfo(IsFriendGroup, IsFriendUser,
+
+            var ideas = (await this.ideasSvc.GetVisibleIdeas(CurrentUser.Id, filteredTargetGroupIds,
+                filteredTargetUserIds, onlyNotReserved, onlyReservedByMe, onlySentByMe, skip, take + 1));
+            var ideaInfos = ideas
+                .Take(take)
+                .Select(i => (i.ToInfo(IsFriendGroup, IsFriendUser,
                     i.CreatorUserId == CurrentUser.Id &&
                     i.Users.Any(u => u.UserId == CurrentUser.Id)
                     )))
                 .ToList();
-        }
+            //var count = skip == 0
+            //    ? (await this.ideasSvc.GetVisibleIdeasCount(CurrentUser.Id, filteredTargetGroupIds, filteredTargetUserIds,
+            //        onlyNotReserved, onlyReservedByMe, onlySentByMe)) : 0;
+
+            return new PagedIdeasQueryResult
+            {
+                Ideas = ideaInfos,
+                HasMore = ideas.Count > take
+            };
+        }   
 
         [HttpGet]
         [Route("own-ideas")]

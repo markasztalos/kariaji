@@ -1,5 +1,5 @@
 import { Inject, Injectable } from "@angular/core";
-import { ApiBaseService } from "./api-base-service";
+import { ApiBaseService, buildUrl } from "./api-base-service";
 import { HttpClient } from "@angular/common/http";
 import { KariajiDialogsService } from "./dialogs.service";
 import { CreateIdeaModel, CompactIdea, Idea, IdeaComment, Reservation } from "../models/models";
@@ -18,8 +18,16 @@ export class IdeasApiService extends ApiBaseService {
         return this.get<Idea[]>('ideas/except-mine');
     }
 
-    public getVisibleIdeas(): Observable<Idea[]> {
-        return this.get<Idea[]>('ideas');
+    public getVisibleIdeas(filteredTargetGroupIds: number[], filteredTargetUserIds: number[], onlyNotReserved: boolean, onlyReservedByMe: boolean, onlySentByMe: boolean, skip: number, take: number): Observable<{ideas: Idea[], hasMore : boolean }> {
+        return this.get<{ideas: Idea[], hasMore : boolean }>(buildUrl('ideas', {
+            filteredTargetGroupIds,
+            filteredTargetUserIds,
+            onlyNotReserved,
+            onlyReservedByMe,
+            onlySentByMe,
+            skip,
+            take
+        }));
     }
 
     public getOwnIdeas() {

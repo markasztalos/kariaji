@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { ApiBaseService, buildUrl } from "./api-base-service";
 import { HttpClient } from "@angular/common/http";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { OwnMembership, CompactGroup, Group, UserGroupInvitation, CompactUser } from "../models/models";
+import { OwnMembership, CompactGroup, Group, UserGroupInvitation, CompactUser, FriendsData } from "../models/models";
 import { Observable } from "rxjs";
 import { KariajiDialogsService } from "./dialogs.service";
 
@@ -71,5 +71,9 @@ export class UserGroupApiService extends ApiBaseService {
     }
     getContainerGroups() : Observable<Group[]> {
         return this.get(`container-groups`);
+    }
+
+    public getDataOfFriends() : Observable<FriendsData> {
+        return this.get(`friends`);
     }
 }

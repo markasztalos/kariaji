@@ -52,14 +52,18 @@ namespace Kariaji.WebApi.Controllers
         [Route("groups/{groupId}")]
         public async Task<ActionResult<GroupInfo>> GetGroup(int groupId)
         {
+            //var group = await this.ugSvc.GetGroupByIdAsync(groupId);
+            //if (group == null)
+            //    return BadRequest(CommonResult.NewError("A csoport nem található"));
+
+            //if (!group.Memberships.Any(m => !m.IsDeleted && m.UserId == CurrentUser.Id))
+            //    return BadRequest(CommonResult.NewError("Nem tagja ennek a csoportnak"));
+
+            //return Ok(group.ToInfo());
+            if (!this.FriendGroupIds.Contains(groupId))
+                return BadRequest(CommonResult.NewError("Nem vagy tagja ennek a csoportnak"));
             var group = await this.ugSvc.GetGroupByIdAsync(groupId);
-            if (group == null)
-                return BadRequest(CommonResult.NewError("A csoport nem található"));
-
-            if (!group.Memberships.Any(m => !m.IsDeleted && m.UserId == CurrentUser.Id))
-                return BadRequest(CommonResult.NewError("Nem tagja ennek a csoportnak"));
-
-            return Ok(group.ToInfo());
+            return group.ToInfo();
         }
 
         [HttpGet]
@@ -149,7 +153,14 @@ namespace Kariaji.WebApi.Controllers
         [Route("user/{userId}/avatar")]
         public  async Task<ActionResult> GetAvatar(int userId)
         {
-            if (userId != CurrentUser.Id && (!(await this.ugSvc.AreUsersFriends(userId, CurrentUser.Id))))
+            //if (userId != CurrentUser.Id && (!(await this.ugSvc.AreUsersFriends(userId, CurrentUser.Id))))
+            //    throw KariajiException.NotAuthorized;
+            //var avatar = await this.ugSvc.GetAvatarOfUserAsync(userId);
+            //if (avatar != null)
+            //    return File(avatar.Data, avatar.ContentType);
+            //else
+            //    return NoContent();
+            if ((userId != CurrentUser.Id) && !this.FriendUserIds.Contains(userId))
                 throw KariajiException.NotAuthorized;
             var avatar = await this.ugSvc.GetAvatarOfUserAsync(userId);
             if (avatar != null)
@@ -164,7 +175,19 @@ namespace Kariaji.WebApi.Controllers
         {
             if (userId != CurrentUser.Id && (!(await this.ugSvc.AreUsersFriends(userId, CurrentUser.Id))))
                 throw KariajiException.NotAuthorized;
-            return Ok(this.ugSvc.GetUserById(userId).ToCompactInfo());
+            return Ok((await this.ugSvc.GetUserById(userId)).ToCompactInfo());
+        }
+
+        [HttpGet]
+        [Route("friends")]
+        public async Task<ActionResult<FriendsData>> GetDataOfFriends()
+        {
+            return new FriendsData
+            {
+                FriendUsers = (await this.ugSvc.GetUsersByIds(this.FriendUserIds.ToList())).Select(u => u.ToCompactInfo()).ToList(),
+                FriendGroups = (await this.ugSvc.GetContainerGroupsAsync(CurrentUser.Id)).Select(g => g.ToInfo()).ToList(),
+                //FriendAvatars = (await this.ugSvc.GetAvatarsOfUsersAsync(this.FriendUserIds.ToList())).ToList()
+            };
         }
 
         [HttpDelete]

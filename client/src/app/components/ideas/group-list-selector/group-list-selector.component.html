@@ -1,0 +1,20 @@
+<div class="d-flex align-items-center" *ngIf="groups">
+  <div>
+    <button mat-mini-fab [matMenuTriggerFor]="addGroupMenu" title="Csoport hozzáadása" [disabled]="!selectableGroups.length">
+      <mat-icon>group_add</mat-icon>
+    </button>
+    <mat-menu #addGroupMenu>
+      <button mat-menu-item *ngFor="let g of (selectableGroups ? selectableGroups : [])" (click)="addGroup(g)">
+        <kariaji-group-avatar [groupId]="g"></kariaji-group-avatar>
+      </button>
+    </mat-menu>
+  </div>
+  <div class="d-flex align-items-center" style="flex-wrap: wrap">
+    <button color="warn" style="margin-left:3px; margin-top:2px;margin-bottom:2px; padding-left:4px;padding-right:4px;" mat-button *ngFor="let g of selectedGroups" (click)="removeGroup(g)">
+      <div class="d-flex align-items-center">
+        <mat-icon>delete</mat-icon>
+        <kariaji-group-avatar [groupId]="g"></kariaji-group-avatar>
+      </div>
+    </button>
+  </div>
+</div>

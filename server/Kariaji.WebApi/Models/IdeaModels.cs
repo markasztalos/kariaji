@@ -41,7 +41,7 @@ namespace Kariaji.WebApi.Models
             Id = reservation.Id,
             ReserverUserId = reservation.ReserverUserId,
             ReservationTime = reservation.ReservationTime.ToHungarianDateTime(),
-            JoinedUserIds = reservation.Joins?.Select(j => j.UserId).ToList()
+            JoinedUserIds = reservation.ReservationJoins?.Select(j => j.UserId).ToList()
 
         };
 
@@ -104,6 +104,12 @@ namespace Kariaji.WebApi.Models
     public class CreateTextDeltaModel
     {
         public string TextDelta { get; set; }
+    }
+
+    public class PagedIdeasQueryResult
+    {
+        public List<IdeaInfo> Ideas { get; set; }
+        public bool HasMore {get; set; }
     }
 
 }

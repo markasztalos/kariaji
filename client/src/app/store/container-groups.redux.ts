@@ -16,7 +16,7 @@ export class ContainerGroupsStateService {
 
     }
 
-    private setContainerGroups(groups: Group[]) {
+    public setContainerGroups(groups: Group[]) {
         this.ngRedux.dispatch(createActionWithValue(SET_CONTAINER_GROUPS, groups));
     }
 

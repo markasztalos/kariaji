@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Security.AccessControl;
 using System.Threading.Tasks;
 using Kariaji.WebApi.DAL;
@@ -80,7 +81,7 @@ namespace Kariaji.WebApi.Services
                 i.TargetGroups.Any(g =>
                     g.Group.Memberships.Any(m => m.UserId == userId && !m.IsDeleted)) &&
                 i.Users.All(u => u.UserId != userId) &&
-                !i.ReservationId.HasValue
+                (i.Reservation == null)
             );
         }
         public async Task<bool> CanUpdateGotIt(int userId, int ideaId)
@@ -98,7 +99,7 @@ namespace Kariaji.WebApi.Services
             var idea = await this.ctx.Ideas.FirstOrDefaultAsync(i => i.Id == ideaId);
             if (idea == null)
                 throw KariajiException.BadParamters;
-            if (idea.ReservationId.HasValue)
+            if (idea.Reservation != null)
                 throw KariajiException.NewPublic("Ezt az ötletet már lefoglalták");
 
             var reservation = new Reservation
@@ -135,7 +136,7 @@ namespace Kariaji.WebApi.Services
         {
             return await ctx.Reservations.AnyAsync(r =>
                 r.Id == reservationId &&
-                r.Joins.All(j => j.UserId != userId) &&
+                r.ReservationJoins.All(j => j.UserId != userId) &&
                 r.Idea.TargetGroups.Any(g =>
                     g.Group.Memberships.Any(m => m.UserId == userId && !m.IsDeleted)) &&
                 r.Idea.Users.All(u => u.UserId != userId));
@@ -159,7 +160,7 @@ namespace Kariaji.WebApi.Services
                 j.ReservationId == reservationId &&
                 (j.UserId == removeUserId &&
                  (j.Reservation.ReserverUserId == currentUserId || currentUserId == removeUserId)));
-            
+
         }
 
         public async Task RemoveJoin(int reservationId, int userId)
@@ -174,29 +175,72 @@ namespace Kariaji.WebApi.Services
             return await ctx.Ideas.FirstOrDefaultAsync(i => i.Id == ideaId);
         }
 
-        
 
-        public async Task<List<Idea>> GetVisibleIdeas(int userId)
+
+        public async Task<List<Idea>> GetVisibleIdeas(int userId,
+            IReadOnlyList<int> filteredTargetGroupIds,
+            IReadOnlyList<int> filteredTargetUserIds,
+            bool onlyNotReserved,
+            bool onlyReservedByMe,
+            bool onlySentByMe,
+            int skip, int take
+            )
         {
-            return await ctx.Ideas
-                .Include(i => i.Reservation).ThenInclude(r => r.Joins)
-                .Include(i => i.TargetGroups).Include(i => i.Users)
+            var query = GetQueryForVisibleIdeas(userId, filteredTargetGroupIds, filteredTargetUserIds, onlyNotReserved, onlyReservedByMe, onlySentByMe);
+            return await query.Skip(skip)
+                .Take(take)
+                .ToListAsync();
+        }
+
+        public async Task<int> GetVisibleIdeasCount(int userId,
+            IReadOnlyList<int> filteredTargetGroupIds,
+            IReadOnlyList<int> filteredTargetUserIds,
+            bool onlyNotReserved,
+            bool onlyReservedByMe,
+        bool onlySentByMe
+        )
+        {
+            var query = GetQueryForVisibleIdeas(userId, filteredTargetGroupIds, filteredTargetUserIds, onlyNotReserved, onlyReservedByMe, onlySentByMe);
+            return await query.CountAsync();
+        }
+
+        private IQueryable<Idea> GetQueryForVisibleIdeas(int userId, IReadOnlyList<int> filteredTargetGroupIds, IReadOnlyList<int> filteredTargetUserIds, bool onlyNotReserved, bool onlyReservedByMe, bool onlySentByMe)
+        {
+            var query = ctx.Ideas
+                .Include(i => i.Reservation).ThenInclude(r => r.ReservationJoins)
+                .Include(i => i.TargetGroups)
                 .Include(i => i.Users)
                 .Include(i => i.Comments)
                 .Where(i =>
-                    i.CreatorUserId == userId ||
+                    (i.CreatorUserId == userId ||
                     (i.TargetGroups.Any(g => g.Group.Memberships.Any(m => m.UserId == userId && !m.IsDeleted)) &&
-                    i.Users.All(u => u.UserId != userId))
-                )
-                .OrderByDescending(i => i.CreationTime)
-                .ToListAsync();
+                     i.Users.All(u => u.UserId != userId))) &&
+                    //(filteredTargetGroupIds == null || filteredTargetGroupIds.Any(g => i.TargetGroups.Any(g2 => g2.GroupId == g))) &&
+                    //(filteredTargetUserIds == null || filteredTargetUserIds.Any(g => i.Users.Where(u => !u.IsSecret).Any(u => u.UserId == g))) &&
+                    (!onlyNotReserved || (i.Reservation == null || i.Reservation.ReserverUserId == userId)) &&
+                    (!onlyReservedByMe || (i.Reservation != null) && i.Reservation.ReserverUserId == userId) &&
+                    (!onlySentByMe || i.CreatorUserId == userId)
+                );
+
+            if (filteredTargetGroupIds != null)
+            {
+                query = query.Where(i => i.TargetGroups.Any(g => filteredTargetGroupIds.Contains(g.GroupId)));
+            }
+
+            if (filteredTargetUserIds != null)
+            {
+                //query = query.Where(i => filteredTargetUserIds.Any(g => i.Users/*.Where(u => !u.IsSecret)*/.Any(u => u.UserId == g)));
+                query = query.Where(i => i.Users.Where(u => !u.IsSecret).Any(u => filteredTargetUserIds.Contains(u.UserId)));
+            }
+            query = query.OrderByDescending(i => i.CreationTime);
+            return query;
         }
-        
+
 
         public async Task<List<Idea>> GetVisibleIdeasExceptMine(int userId)
         {
             return await ctx.Ideas
-                .Include(i => i.Reservation).ThenInclude(r => r.Joins)
+                .Include(i => i.Reservation).ThenInclude(r => r.ReservationJoins)
                 .Include(i => i.TargetGroups).Include(i => i.Users)
                 .Where(i =>
                     i.TargetGroups.Any(g => g.Group.Memberships.Any(m => m.UserId == userId && !m.IsDeleted)) &&
@@ -249,7 +293,7 @@ namespace Kariaji.WebApi.Services
             );
         }
 
-        
+
 
         public async Task<IdeaComment> CreateComment(int userId, int ideaId, string textDelta)
         {

@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Kariaji.WebApi.Helpers;
+using Microsoft.AspNetCore.Identity.UI.Pages.Internal.Account;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Console;
 
 namespace Kariaji.WebApi.DAL
 {
@@ -16,47 +19,112 @@ namespace Kariaji.WebApi.DAL
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            modelBuilder.Entity<Membership>()
-                .HasKey(bc => new { bc.GroupId, MemberUserId = bc.UserId });
-            modelBuilder.Entity<Membership>()
-                .HasOne(bc => bc.Group)
-                .WithMany(b => b.Memberships)
-                .HasForeignKey(bc => bc.GroupId);
-            modelBuilder.Entity<Membership>()
-                .HasOne(bc => bc.User)
-                .WithMany(c => c.Memberships)
-                .HasForeignKey(bc => bc.UserId);
+            //modelBuilder.Entity<Membership>()
+            //    .HasKey(bc => new { bc.GroupId, MemberUserId = bc.UserId });
+            //modelBuilder.Entity<Membership>()
+            //    .HasOne(bc => bc.Group)
+            //    .WithMany(b => b.Memberships)
+            //    .HasForeignKey(bc => bc.GroupId);
+            //modelBuilder.Entity<Membership>()
+            //    .HasOne(bc => bc.User)
+            //    .WithMany(c => c.Memberships)
+            //    .HasForeignKey(bc => bc.UserId);
 
-            modelBuilder.Entity<IdeaUser>()
-                .HasKey(bc => new { bc.UserId, bc.IdeaId });
-            modelBuilder.Entity<IdeaUser>()
-                .HasOne(bc => bc.User)
-                .WithMany(b => b.Ideas)
-                .HasForeignKey(bc => bc.UserId);
-            modelBuilder.Entity<IdeaUser>()
-                .HasOne(bc => bc.Idea)
-                .WithMany(c => c.Users)
-                .HasForeignKey(bc => bc.IdeaId);
+            //modelBuilder.Entity<IdeaUser>()
+            //    .HasKey(bc => new { bc.UserId, bc.IdeaId });
+            //modelBuilder.Entity<IdeaUser>()
+            //    .HasOne(bc => bc.User)
+            //    .WithMany(b => b.Ideas)
+            //    .HasForeignKey(bc => bc.UserId);
+            //modelBuilder.Entity<IdeaUser>()
+            //    .HasOne(bc => bc.Idea)
+            //    .WithMany(c => c.Users)
+            //    .HasForeignKey(bc => bc.IdeaId);
 
 
-            modelBuilder.Entity<IdeaTargetGroup>()
-                .HasKey(bc => new { bc.GroupId, bc.IdeaId });
-            modelBuilder.Entity<IdeaTargetGroup>()
-                .HasOne(bc => bc.Group)
-                .WithMany(b => b.IdeaTargets)
-                .HasForeignKey(bc => bc.GroupId);
-            modelBuilder.Entity<IdeaTargetGroup>()
-                .HasOne(bc => bc.Idea)
-                .WithMany(c => c.TargetGroups)
-                .HasForeignKey(bc => bc.IdeaId);
+            //modelBuilder.Entity<IdeaTargetGroup>()
+            //    .HasKey(bc => new { bc.GroupId, bc.IdeaId });
+            //modelBuilder.Entity<IdeaTargetGroup>()
+            //    .HasOne(bc => bc.Group)
+            //    .WithMany(b => b.IdeaTargets)
+            //    .HasForeignKey(bc => bc.GroupId);
+            //modelBuilder.Entity<IdeaTargetGroup>()
+            //    .HasOne(bc => bc.Idea)
+            //    .WithMany(c => c.TargetGroups)
+            //    .HasForeignKey(bc => bc.IdeaId);
 
-            modelBuilder.Entity<Idea>()
-                .HasOne(i => i.Reservation)
-                .WithOne(r => r.Idea)
-                .HasForeignKey<Reservation>(r => r.IdeaId);
+            //modelBuilder.Entity<Idea>()
+            //    .HasOne(i => i.Reservation)
+            //    .WithOne(r => r.Idea)
+            //    .HasForeignKey<Reservation>(r => r.IdeaId);
+
+
+            //modelBuilder.Entity<ReservationJoin>()
+            //    .HasKey(j => new { j.ReservationId, j.UserId });
+
+            //modelBuilder.Entity<Reservation>()
+            //    .HasOne(res => res.Idea)
+            //    .WithOne(idea => idea.Reservation);
+            //modelBuilder.Entity<Idea>()
+            //    .HasOne(i => i.Reservation)
+            //    .WithOne(r => r.Idea)
+            //    .IsRequired(false);
+
+            modelBuilder.Entity<User>()
+                .HasIndex(u => u.Email)
+                .IsUnique();
+            modelBuilder.Entity<Reservation>()
+                .HasIndex(r => r.IdeaId);
+            modelBuilder.Entity<Reservation>()
+                .HasIndex(r => r.ReserverUserId);
+            modelBuilder.Entity<Group>()
+                .HasIndex(u => u.CreatorUserId);
+
 
             modelBuilder.Entity<ReservationJoin>()
-                .HasKey(j => new { j.ReservationId, j.UserId });
+                .HasIndex(rj => new {rj.ReservationId, rj.UserId})
+                .IsUnique();
+            modelBuilder.Entity<Membership>()
+                .HasIndex(m => new {m.GroupId, m.UserId})
+                .IsUnique();
+            modelBuilder.Entity<Membership>()
+                .HasIndex(m => m.UserId);
+
+
+            modelBuilder.Entity<Membership>()
+                .HasIndex(m => m.GroupId);
+
+            modelBuilder.Entity<Avatar>()
+                .HasIndex(m => m.UserId)
+                .IsUnique();
+
+            modelBuilder.Entity<UserGroupInvitation>()
+                .HasIndex(m => m.GroupId);
+
+            modelBuilder.Entity<IdeaTargetGroup>()
+                .HasIndex(itg => new {itg.GroupId, itg.IdeaId})
+                .IsUnique();
+            modelBuilder.Entity<IdeaTargetGroup>()
+                .HasIndex(i => i.GroupId);
+
+            modelBuilder.Entity<IdeaUser>()
+                .HasIndex(iu => new {iu.IdeaId, iu.UserId})
+                .IsUnique();
+            modelBuilder.Entity<IdeaUser>()
+                .HasIndex(iu => iu.IdeaId);
+            modelBuilder.Entity<IdeaUser>()
+                .HasIndex(iu => iu.UserId);
+
+            modelBuilder.Entity<Idea>()
+                .HasIndex(i => i.CreatorUserId);
+            modelBuilder.Entity<IdeaComment>()
+                .HasIndex(i => i.IdeaId);
+            modelBuilder.Entity<IdeaComment>()
+                .HasIndex(i => i.UserId);
+            
+                
+            
+
 
 
             modelBuilder.WithDisabledCascadeDeleteOnForeignKeys();
@@ -67,7 +135,9 @@ namespace Kariaji.WebApi.DAL
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.EnableSensitiveDataLogging();
+            optionsBuilder
+                .UseLoggerFactory( new LoggerFactory(new[] { new ConsoleLoggerProvider((_, __) => true, true) }))
+                .EnableSensitiveDataLogging();
             base.OnConfiguring(optionsBuilder);
         }
 

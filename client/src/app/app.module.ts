@@ -1,4 +1,8 @@
+
+import {MatSelectModule} from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
+import {MatCheckboxModule} from '@angular/material/checkbox';
+
 import {MatTooltipModule} from '@angular/material/tooltip';
 
 import {MatBadgeModule} from '@angular/material/badge';
@@ -61,6 +65,9 @@ import { IdeasApiService } from './services/ideas-api.service';
 import { IdeasListComponent } from './components/ideas/ideas-list/ideas-list.component';
 import { GroupAvatarComponent } from './components/common/group-avatar/group-avatar.component';
 import { EditIdeaComponent } from './components/ideas/edit-idea/edit-idea.component';
+import { GroupListSelectorComponent } from './components/ideas/group-list-selector/group-list-selector.component';
+import { UserListSelectorComponent } from './components/ideas/user-list-selector/user-list-selector.component';
+import { FriendsService } from './services/friends.service';
 
 
 
@@ -87,6 +94,8 @@ import { EditIdeaComponent } from './components/ideas/edit-idea/edit-idea.compon
     IdeasListComponent,
     GroupAvatarComponent,
     EditIdeaComponent,
+    GroupListSelectorComponent,
+    UserListSelectorComponent,
 
   ],
   imports: [
@@ -94,6 +103,7 @@ import { EditIdeaComponent } from './components/ideas/edit-idea/edit-idea.compon
     MatToolbarModule,
     MatBadgeModule,
     MatSlideToggleModule,
+    MatCheckboxModule,
     BrowserModule,
     MatProgressSpinnerModule,
     ToastrModule.forRoot(),
@@ -110,6 +120,7 @@ import { EditIdeaComponent } from './components/ideas/edit-idea/edit-idea.compon
     MatCardModule,
     MatDialogModule,
     FontAwesomeModule,
+    MatSelectModule,
     MatTooltipModule,
     HttpClientModule,
     FormsModule,
@@ -125,6 +136,7 @@ import { EditIdeaComponent } from './components/ideas/edit-idea/edit-idea.compon
     MyAccountApiService,
     UserGroupApiService,
     AvatarsActions,
+    FriendsService,
     KariajiDialogsService,
     UsersStateService,
     NgStoreService,

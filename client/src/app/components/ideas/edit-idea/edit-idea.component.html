@@ -13,7 +13,7 @@
     <h4>Ötlet</h4>
     <mat-divider></mat-divider>
     <div *ngIf="detailedIdea.creatorUserId !== userId" style="margin-top:1em" [innerHtml]="getText(detailedIdea.textDelta)"></div>
-    <div *ngIf="detailedIdea.creatorUserId === userId" class="d-flex align-items-center">
+    <div *ngIf="detailedIdea.creatorUserId === userId" class="d-flex align-items-center" style="margin-top:1em">
       <kariaji-rich-textarea #textEditor [content]="detailedIdea.textDelta" class="flex-grow-1"></kariaji-rich-textarea>
       <button mat-mini-fab style="margin-left:1em" (click)="editText()">
         <mat-icon>edit</mat-icon>
@@ -121,7 +121,7 @@
           <!-- <div class="d-flex flex-row" style="margin-left:1em;margin-top:1em">
               <span style="font-size:smaller;border-bottom:1px solid lightgray">{{comment.creationTime}}</span>
             </div> -->
-          <div style="margin-left: 1em" class="d-flex align-items-center" title="{{comment.creationTime}}">
+          <div style="margin-left: 1em" class="d-flex align-items-center flex-wrap" title="{{comment.creationTime}}">
             <kariaji-user-avatar [userId]="comment.userId"></kariaji-user-avatar>
 
             <div style="margin-left:3px" [innerHtml]="getText(comment.textDelta)" class="user-text align-self-center flex-grow-1"></div>

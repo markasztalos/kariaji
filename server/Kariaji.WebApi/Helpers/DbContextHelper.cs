@@ -171,16 +171,35 @@ namespace Kariaji.WebApi.Helpers
                 return idea;
             }
 
-            for (int i = 0; i < 30; i++)
+            for (int i = 0; i < 500; i++)
             {
                 WriteIdea(mari, $"Ötlet{i++}", new[] { asztalos, hodsagi }, new[] { mark });
                 WriteIdea(mari, $"Ötlet{i++}", new[] { asztalos, hodsagi }, new[] { mari });
 
-                WriteIdea(mari, $"Ötlet{i++}", new[] { asztalos, hodsagi }, new[] { julcsi, palko, mami, apo });
+                WriteIdea(mari, $"Ötlet{i++}", new[] {  hodsagi }, new[] { julcsi, palko, mami, apo });
                 WriteIdea(julcsi, $"Ötlet{i++}", new[] { hodsagi }, new[] { mari });
                 WriteIdea(julcsi, $"Ötlet{i++}", new[] { hodsagi }, new[] { julcsi });
-                WriteIdea(julcsi, $"Ötlet{i++}", new[] { hodsagi }, new[] { palko });
-                WriteIdea(julcsi, $"Ötlet{i++}", new[] { hodsagi }, new[] { julcsi, palko });
+                var idea1 = WriteIdea(julcsi, $"Ötlet{i++}", new[] { hodsagi }, new[] { palko });
+                var reservation1 = new Reservation
+                {
+                    Idea = idea1,
+                    ReserverUser = mari
+                };
+                ctx.Reservations.Add(reservation1);
+
+                ctx.ReservationJoins.Add(new ReservationJoin
+                {
+                    User = mark,
+                    Reservation = reservation1,
+                });
+
+                var idea2 = WriteIdea(julcsi, $"Ötlet{i++}", new[] { hodsagi }, new[] { julcsi, palko });
+                var reservation2 = new Reservation
+                {
+                    Idea = idea2,
+                    ReserverUser = mark
+                };
+                ctx.Reservations.Add(reservation2);
             }
 
             await ctx.SaveChangesAsync();

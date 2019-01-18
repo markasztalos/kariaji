@@ -128,6 +128,13 @@ namespace Kariaji.WebApi.Models
         public bool IsAdministrator { get; set; }
     }
 
+    public class FriendsData
+    {
+        public List<CompactUserInfo> FriendUsers { get; set; }
+        public List<GroupInfo> FriendGroups { get; set; }
+        //public List<Avatar> FriendAvatars {get; set; }
+    }
+
  
 
 }

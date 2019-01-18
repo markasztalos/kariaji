@@ -1,6 +1,6 @@
 import { Component, OnInit, ViewChild, TemplateRef, ElementRef, OnDestroy } from '@angular/core';
 import { CompactIdea, Idea, Group, IdeaComment, CompactUser, Reservation } from 'src/app/models/models';
-import { select } from '@angular-redux/store';
+import { select, NgRedux } from '@angular-redux/store';
 import { IKariajiAppState, IIdeasListState } from 'src/app/store/app.state';
 import { Observable, Subject } from 'rxjs';
 import { IdeasListStateService } from 'src/app/store/ideas-list.redux';
@@ -13,6 +13,9 @@ import { KariajiDialogsService } from 'src/app/services/dialogs.service';
 import { MyAccountStateWrapperService } from 'src/app/store/user-groups.redux';
 import { RichTextareaComponent } from '../../common/rich-textarea/rich-textarea.component';
 import { MatDialogRef } from '@angular/material';
+import { UserGroupApiService } from 'src/app/services/user-group-adi.service';
+import { FriendsService } from 'src/app/services/friends.service';
+import { UserListSelectorComponent } from '../user-list-selector/user-list-selector.component';
 
 @Component({
   selector: 'kariaji-ideas-list',
@@ -27,12 +30,41 @@ export class IdeasListComponent implements OnInit, OnDestroy {
     this.ngUnsubscribe.complete();
   }
 
-  constructor(private ideasListStateSvc: IdeasListStateService, private ideasApi: IdeasApiService, private myAccountStateSvc: MyAccountStateWrapperService, private sanitizer: DomSanitizer, private cotnainerGroupStateSvc: ContainerGroupsStateService, private dialogs: KariajiDialogsService) { }
+  constructor(private ideasListStateSvc: IdeasListStateService,
+    private ideasApi: IdeasApiService,
+    private myAccountStateSvc: MyAccountStateWrapperService,
+    private sanitizer: DomSanitizer,
+    private friendsSvc: FriendsService,
+    private cotnainerGroupStateSvc: ContainerGroupsStateService,
+    private ugApiSvc: UserGroupApiService,
+    private ngRedux: NgRedux<IKariajiAppState>,
+    private dialogs: KariajiDialogsService) { }
 
   ngOnInit() {
-    this.refreshList();
+
+    this.ensureFriends();
+
+    // this.refreshList();
+
+    this.containerGroups$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(cgs => {
+      this.containerGroups = cgs;
+      this.filters.groupIds = cgs ? cgs.sort((g1, g2) => g1.displayName.localeCompare(g2.displayName)).map(cg => cg.id) : [];
+      this.filters.userIds = cgs ? cgs.mapMany(cg => cg.members.map(m => m.user)).sort((u1, u2) => u1.displayName.localeCompare(u2.displayName)).map(u => u.id).distinct() : [];
+      this.filters.onlyNotReserved = false;
+      this.filters.onlyReservedByMe = false;
+      this.filters.onlySentByMe = false;
+      this.filters.skip = 0;
+      this.filters.take = 30;
+
+    });
+
 
     this.userId$.pipe(takeUntil(this.ngUnsubscribe)).subscribe(uid => this.userId = uid);
+  }
+
+
+  ensureFriends(): any {
+    this.friendsSvc.ensureFriends();
   }
 
   user$: Observable<CompactUser> = this.myAccountStateSvc.provideCurrentUser();
@@ -44,17 +76,70 @@ export class IdeasListComponent implements OnInit, OnDestroy {
   ideas$: Observable<Idea[]> = this.ideasListState$.pipe(map(s => s.ideas));
 
   refreshList() {
+
     this.ideasListStateSvc.setShownIdeas(null);
-    this.ideasApi.getVisibleIdeas().subscribe(ideas =>
-      this.ideasListStateSvc.setShownIdeas(ideas));
+    this.filters.skip = 0;
+
+    this.runQuery();
   }
+
+  runQuery() {
+    this.showSpinner = true;
+    this.ideasListStateSvc.setShownIdeas(null);
+    this.ideasApi.getVisibleIdeas(this.filters.groupIds, this.filters.userIds, this.filters.onlyNotReserved, this.filters.onlyReservedByMe, this.filters.onlySentByMe, this.filters.skip, this.filters.take).subscribe(result => {
+      this.ideasListStateSvc.setShownIdeas(result.ideas);
+      this.showSpinner = false;
+      this.hasMore = result.hasMore;
+      this.count = result.ideas.length;
+    }, () => this.showSpinner = false);
+  }
+
+  showSpinner: boolean;
 
   getText(textDelta: string) {
     return this.sanitizer.bypassSecurityTrustHtml(new QuillDeltaToHtmlConverter(JSON.parse(textDelta).ops).convert());
   }
 
   containerGroups$: Observable<Group[]> = this.cotnainerGroupStateSvc.getContainerGroups$();
+  containerGroupIds$: Observable<number[]> = this.containerGroups$.pipe(map(gs => gs ? gs.sort((g1, g2) => g1.displayName.localeCompare(g2.displayName)).map(g => g.id) : []));
+  containerGroups: Group[];
 
+  get userIdsInFilteredGroups(): number[] {
+    return this.containerGroups ? this.containerGroups.filter(cg => this.filters.groupIds.indexOf(cg.id) >= 0).mapMany(g => g.members.map(m => m.user)).sort((u1, u2) => u1.displayName.localeCompare(u2.displayName)).map(u => u.id).distinct() : [];
+  }
+
+  get usersInAllContainerGroups(): number[] {
+    return this.containerGroups ? this.containerGroups.mapMany(cg => cg.members.map(m => m.user)).sort((a, b) => a.displayName.localeCompare(b.displayName)).map(u => u.id).distinct() : [];
+  }
+
+  get page() {
+    return Math.ceil(this.filters.skip / this.filters.take);
+  }
+  hasMore: boolean = false;
+
+  get take() { return this.filters.take; }
+  set take(value: string | number) {
+    this.filters.take = (typeof value === 'string') ? parseInt(value) : value;
+    this.refreshList();
+  }
+
+  filters: {
+    groupIds: number[],
+    userIds: number[],
+    onlyNotReserved: boolean,
+    onlyReservedByMe: boolean,
+    onlySentByMe: boolean,
+    take: number;
+    skip: number;
+  } = {
+      groupIds: [],
+      userIds: [],
+      onlyNotReserved: false,
+      onlyReservedByMe: false,
+      onlySentByMe: false,
+      take: 30,
+      skip: 0
+    };
 
 
 
@@ -161,6 +246,58 @@ export class IdeasListComponent implements OnInit, OnDestroy {
     this.newIdeaDialog = null;
   }
 
+  navigateToFirstPage() {
+    this.filters.skip = 0;
+    this.runQuery();
+  }
+  navigateToNextPage() {
+    this.filters.skip += this.filters.take;
+    this.runQuery();
+  }
+  navigateToPreviousPage() {
+    this.filters.skip -= this.filters.take;
+    this.runQuery();
+  }
+  get maxIndexOfShownIdeas() {
+    // console.log(this.skip);
+    // console.log(this.count);
+    // console.log(this.skip + this.count);
+    return this.filters.skip + this.count;
+  }
+  count: number = 0;
+
+  showMyList() {
+    this.filters.groupIds = this.containerGroups.map(g => g.id);
+    this.filters.userIds = [this.userId];
+    this.filters.skip = 0;
+    this.filters.onlyNotReserved = false;
+    this.filters.onlyReservedByMe = false;
+    this.filters.onlySentByMe = false;
+    this.refreshList();
+  }
+
+  @ViewChild('filteredUserIdsSelector') filteredUserIdsSelector : UserListSelectorComponent;
+
+  showUserList(userId: number) {
+    this.filters.groupIds = this.containerGroups.filter(cg => cg.members.some(m => m.user.id === userId)).map(g => g.id);
+    this.filters.userIds = [userId];
+    this.filteredUserIdsSelector.setUsersAndSelection(this.userIdsInFilteredGroups, this.filters.userIds);
+    this.filters.skip = 0;
+    this.filters.onlyNotReserved = false;
+    this.filters.onlyReservedByMe = false;
+    this.filters.onlySentByMe = false;
+    this.refreshList();
+  }
+  showAll() {
+    this.filters.groupIds = this.containerGroups.map(g => g.id);
+    this.filters.userIds = this.userIdsInFilteredGroups;
+    this.filters.skip = 0;
+    this.filters.onlyNotReserved = false;
+    this.filters.onlyReservedByMe = false;
+    this.filters.onlySentByMe = false;
+    this.refreshList();
+
+  }
 }
 
 

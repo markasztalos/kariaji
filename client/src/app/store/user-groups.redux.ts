@@ -87,7 +87,7 @@ export class UsersStateService {
     constructor(private ngRedux: NgRedux<IKariajiAppState>, private ugApi : UserGroupApiService) {
 
     }
-    private setUsersInRedux(users: CompactUser[]) {
+    public setUsersInRedux(users: CompactUser[]) {
         this.ngRedux.dispatch(createActionWithValue(SET_USERS, users));
     }
     private deleteUsersInRedux(userIds: number[]) {

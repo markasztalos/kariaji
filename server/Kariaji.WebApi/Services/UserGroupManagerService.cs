@@ -49,9 +49,13 @@ namespace Kariaji.WebApi.Services
             await this.ctx.SaveChangesAsync();
         }
 
-        public User GetUserById(int id)
+        public async Task<User> GetUserById(int id)
         {
-            return this.ctx.Users.FirstOrDefault(u => u.Id == id);
+            return await this.ctx.Users.FirstOrDefaultAsync(u => u.Id == id);
+        }
+        public async Task<List<User>> GetUsersByIds(IReadOnlyList<int> ids)
+        {
+            return await this.ctx.Users.Where(u => ids.Contains(u.Id)).ToListAsync();
         }
 
         public async Task<IEnumerable<Membership>> GetMemberships(int currentUserId)
@@ -223,6 +227,10 @@ namespace Kariaji.WebApi.Services
         {
             return await this.ctx.Avatars.FirstOrDefaultAsync(a => a.UserId == userId);
         }
+        public async Task<List<Avatar>> GetAvatarsOfUsersAsync(IReadOnlyList<int> userIds)
+        {
+            return await this.ctx.Avatars.Where(a => userIds.Contains(a.UserId)).ToListAsync();
+        }
 
         public async Task UpdateAvatarAsync(Avatar avatar)
         {
@@ -286,6 +294,25 @@ namespace Kariaji.WebApi.Services
                 .Where(g => g.Memberships.Any(m => m.UserId == currentUserId && !m.IsDeleted))
                 .ToListAsync();
         }
+
+        public async Task<List<int>> GetContainerGroupIdsAsync(int currentUserId)
+        {
+            return await this.ctx.Groups
+                .Include(g => g.Memberships)
+                .ThenInclude(m => m.User)
+                .Where(g => g.Memberships.Any(m => m.UserId == currentUserId && !m.IsDeleted))
+                .Select(g => g.Id)
+                .ToListAsync();
+        }
+
+        public async Task<List<int>> GetFriendUserIds(int currentUserId)
+        {
+            var userIds = await
+                ctx.Groups.Where(g => !g.IsDeleted && g.Memberships.Any(m => !m.IsDeleted && m.UserId == currentUserId))
+                    .SelectMany(g => g.Memberships.Where(m => !m.IsDeleted).Select(m => m.UserId)).ToListAsync();
+            return userIds;
+        }
+        
     }
 
 }

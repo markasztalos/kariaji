@@ -35,7 +35,6 @@ export class AvatarSelectorComponent implements OnInit, OnDestroy {
     this.displayName$.pipe(takeUntil(this.ngUnsubsribe)).subscribe(() => this.manuallyRefreshAvatarComponent());
 
     this.avatarStateSvc.getAvatarUrl$(this.userId).pipe(takeUntil(this.ngUnsubsribe)).subscribe(src => {
-      console.log(src);
       this.src = src ? this.sanitizer.bypassSecurityTrustResourceUrl(src) : null;
       this.manuallyRefreshAvatarComponent();
     });

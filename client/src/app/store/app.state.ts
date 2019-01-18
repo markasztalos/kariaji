@@ -9,6 +9,7 @@ export interface IKariajiAppState {
     __containerGroups : Group[];
     isNewIdeaDialogShown : boolean;
     ideasListState : IIdeasListState;
+    friendsQueried: boolean;
 }
 export interface IIdeasListState {
     ideas : Idea[];
@@ -25,5 +26,6 @@ export const initialAppState : IKariajiAppState = {
     ideasListState : {
         ideas : null,
         detailedIdeaId : null
-    }
+    },
+    friendsQueried : false
 };

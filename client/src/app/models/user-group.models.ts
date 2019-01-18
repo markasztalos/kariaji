@@ -42,3 +42,17 @@ export class UserGroupInvitation {
     invitedEmail : string;
     sendingDate : string;
 }
+
+export class FriendsData
+{
+    friendUsers : CompactUser[];
+    friendGroups : Group[];
+    // friendAvatars : Avatar[];
+}
+
+export class Avatar {
+    userId: number;
+    id: number;
+    data : any;
+    contentType : string;
+}
