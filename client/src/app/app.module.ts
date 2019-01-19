@@ -1,3 +1,4 @@
+import {MatExpansionModule} from '@angular/material/expansion';
 
 import {MatSelectModule} from '@angular/material/select';
 import { MatSlideToggleModule } from '@angular/material/slide-toggle';
@@ -122,6 +123,7 @@ import { FriendsService } from './services/friends.service';
     FontAwesomeModule,
     MatSelectModule,
     MatTooltipModule,
+    MatExpansionModule,
     HttpClientModule,
     FormsModule,
     NgReduxModule

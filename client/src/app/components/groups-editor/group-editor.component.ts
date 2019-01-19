@@ -40,7 +40,7 @@ export class GroupEditorComponent implements OnInit {
       }
     }
   }
-  private group: Group;
+  group: Group;
 
   updateInvitations() {
     if (this.groupId && this.isAdministrator) {

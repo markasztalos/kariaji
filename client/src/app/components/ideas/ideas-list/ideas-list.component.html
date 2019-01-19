@@ -15,20 +15,18 @@
   <div class="d-flex flex-row align-items-center flex-wrap" style="margin-top:1em;">
     <mat-card class="flex-grow-1">
       <mat-card-title>
-        <h3>
-          Ajándéklisták
-        </h3>
+        Ajándéklisták
       </mat-card-title>
       <mat-card-content>
         <!-- <h4>
         Listák
       </h4> -->
         <div class="d-flex align-items-center flex-wrap">
-          <button mat-raised-button color="primary" (click)="showMyList()">
+          <button mat-raised-button color="primary" (click)="showMyList()" matTooltip="Saját magamnak kiírt ajándékok listája">
             Saját listám
           </button>
           <div style="margin-left:1em; margin-top:3px; margin-bottom:3px;">
-            <button mat-raised-button [matMenuTriggerFor]="selectUserListMenu">
+            <button mat-raised-button [matMenuTriggerFor]="selectUserListMenu" matTooltip="Válaszd ki, hogy kinek szóló ajándékokat szeretnél látni">
               Lista kiválasztása
             </button>
             <mat-menu #selectUserListMenu>
@@ -37,39 +35,11 @@
               </button>
             </mat-menu>
           </div>
-          <button mat-raised-button color="accent" (click)="showAll()" style="margin-left:1em; margin-top:3px; margin-bottom:3px;">
+          <button mat-raised-button color="accent" (click)="showAll()" style="margin-left:1em; margin-top:3px; margin-bottom:3px;" matTooltip="Mutasd az összes ajándékötletet">
             Összes ötlet, amit láthatok
           </button>
         </div>
 
-        <!-- <mat-divider style="margin-top:1em; margin-bottom:1em;" [inset]="true"></mat-divider> -->
-        <div class="d-flex align-items-center">
-          <h4 style="margin-top:1em;" class="flex-grow-1">
-            Részletes kereső
-          </h4>
-          <button mat-mini-fab (click)=" refreshList()" style="margin-left:1em;margin-top:4px;margin-bottom:4px; margin-right:4px;">
-            <mat-icon>refresh</mat-icon>
-          </button>
-        </div>
-        <h5>Csoportok</h5>
-        <mat-divider [inset]="true"></mat-divider>
-        <br />
-        <kariaji-group-list-selector [groups]="containerGroupIds$ | async" [(selectedGroups)]="filters.groupIds"></kariaji-group-list-selector>
-
-        <h5 style="margin-top:1em;">Címzettek</h5>
-        <mat-divider [inset]="true"></mat-divider>
-        <br />
-        <kariaji-user-list-selector #filteredUserIdsSelector [users]="userIdsInFilteredGroups" [(selectedUsers)]="filters.userIds"></kariaji-user-list-selector>
-
-        <br />
-        <h5>További beállítások</h5>
-        <mat-divider [inset]="true"></mat-divider>
-        <br />
-        <mat-checkbox [(ngModel)]="filters.onlyNotReserved"> Csak a szabad ötletek mutatása </mat-checkbox>
-        <br />
-        <mat-checkbox [(ngModel)]="filters.onlyReservedByMe"> Csak azon ötletek mutatása, amiket lefoglaltam </mat-checkbox>
-        <br />
-        <mat-checkbox [(ngModel)]="filters.onlySentByMe"> Csak azon ötletek mutatása, amiket én küldtem be</mat-checkbox>
         <br />
         <div class="d-flex align-items-center">
           Oldalméret:
@@ -80,6 +50,45 @@
             <mat-option value="100">100</mat-option>
           </mat-select>
         </div>
+
+        <mat-expansion-panel style="margin-top:1em;">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Részletes kereső
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+
+
+          <!-- <mat-divider style="margin-top:1em; margin-bottom:1em;" [inset]="true"></mat-divider> -->
+
+          <div>
+            <h5 matTooltip="Válaszd ki, hogy mely csoportok ajándékait szeretnéd látni">Csoportok</h5>
+          </div>
+          <mat-divider [inset]="true"></mat-divider>
+          <br />
+          <kariaji-group-list-selector [groups]="containerGroupIds$ | async" [(selectedGroups)]="filters.groupIds"></kariaji-group-list-selector>
+
+          <h5 style="margin-top:1em;">Címzettek</h5>
+          <mat-divider [inset]="true"></mat-divider>
+          <br />
+          <kariaji-user-list-selector #filteredUserIdsSelector [users]="userIdsInFilteredGroups" [(selectedUsers)]="filters.userIds"></kariaji-user-list-selector>
+
+          <br />
+          <h5>További beállítások</h5>
+          <mat-divider [inset]="true"></mat-divider>
+          <br />
+          <mat-checkbox [(ngModel)]="filters.onlyNotReserved"> Csak a szabad ötletek mutatása </mat-checkbox>
+          <br />
+          <mat-checkbox [(ngModel)]="filters.onlyReservedByMe"> Csak azon ötletek mutatása, amiket lefoglaltam </mat-checkbox>
+          <br />
+          <mat-checkbox [(ngModel)]="filters.onlySentByMe"> Csak azon ötletek mutatása, amiket én küldtem be</mat-checkbox>
+
+          <div class="text-right">
+            <button class="w-100" mat-raised-button color="accent" (click)=" refreshList()" style="margin-top:1em;margin-bottom:1em; ">
+              <mat-icon>refresh</mat-icon> Frissítés
+            </button>
+          </div>
+        </mat-expansion-panel>
       </mat-card-content>
     </mat-card>
 

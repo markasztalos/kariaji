@@ -51,4 +51,6 @@ export class MainComponent implements OnInit {
   onNewIdeaEditingFinished() {
     this.newIdeaStateSvc.setIsNewDialogShown(false);
   }
+
+  year = (new Date()).getFullYear();
 }
