@@ -18,7 +18,7 @@ export class AuthenticationService extends ApiBaseService implements CanActivate
     super(http, dialogs);
   }
 
-  public register(email: string): Observable<{ link: string }> {
+  public register(email: string): Observable</*{ link: string }*/any> {
     return this.http.post<{ link: string }>(`${this.apiBaseUrl}/auth/register`, {
       email
     });

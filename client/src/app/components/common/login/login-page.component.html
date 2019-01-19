@@ -1,5 +1,5 @@
-<div  fxLayout="row" fxLayoutAlign="center center">
-  <mat-card>
+<div fxLayout="row" fxLayoutAlign="center center">
+  <mat-card style="margin-top:3em;">
     <mat-card-title>
       Kariaji
       <mat-card-subtitle>
@@ -7,21 +7,21 @@
       </mat-card-subtitle>
     </mat-card-title>
     <mat-card-content>
-      <form class="full-width">
-        <mat-form-field>
-          <input matInput  id="email" name="email" type="email" placeholder="Email cím" [(ngModel)]="email"/>
+      <form class="w-100">
+        <mat-form-field class="w-100">
+          <input matInput class="w-100" id="email" name="email" type="email" placeholder="Email cím" [(ngModel)]="email" />
         </mat-form-field>
         <br />
-        <mat-form-field>
-            <input matInput id="password" name="password" type="password" placeholder="Jelszó" [(ngModel)]="password" />
+        <mat-form-field class="w-100">
+          <input matInput id="password" class="w-100" name="password" type="password" placeholder="Jelszó" [(ngModel)]="password" />
         </mat-form-field>
       </form>
 
 
     </mat-card-content>
     <mat-card-actions>
-        <button mat-raised-button color="primary" [disabled]="!email || !password" class="btn btn-lg btn-primary btn-block mb-3" (click)="login()">Belépés</button>
-        <a mat-button [href]="['/register']">Regisztráció</a>
+        <button  mat-button color="primary" [disabled]="!email || !password" (click)="login()">BELÉPÉS</button>
+        <a  mat-button [href]="['/register']">REGISZTRÁCIÓ</a>
     </mat-card-actions>
 
   </mat-card>

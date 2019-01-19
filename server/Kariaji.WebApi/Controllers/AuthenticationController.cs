@@ -36,13 +36,14 @@ namespace Kariaji.WebApi.Controllers
         }
 
         [HttpPost("register")]
-        public async Task<ActionResult<RegisterResultModel>> Register([FromBody] RegisterModel model)
+        public async Task<ActionResult/*<RegisterResultModel>*/> Register([FromBody] RegisterModel model)
         {
             var link = await this.authSvc.Register(model.Email);
-            return Ok(new RegisterResultModel
-            {
-                Link = link
-            });
+            //return Ok(new RegisterResultModel
+            //{
+            //    Link = link
+            //});
+            return Ok();
         }
 
         [HttpPost("confirm-registration")]

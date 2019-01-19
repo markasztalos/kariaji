@@ -1,198 +1,216 @@
-<button mat-raised-button style="width:100%" color="primary" (click)="showCreateNewIdea()">Új ötlet kiírása</button>
-
-<!-- Filters -->
-<div class="d-flex flex-row align-items-center flex-wrap" style="margin-top:1em;">
-  <mat-card class="flex-grow-1">
-    <mat-card-title>
-      <h3>
-      Ajándéklisták
-      </h3>
-    </mat-card-title>
+<mat-spinner style="margin-top:1em;" *ngIf="!containerGroups"></mat-spinner>
+<ng-container *ngIf="containerGroups && !containerGroups.length">
+  <mat-card>
+    <mat-card-title>Nem vagy tagja egyetlen csoportnak sem</mat-card-title>
     <mat-card-content>
-      <!-- <h4>
+      Hozz létre egy új csoportot, vagy nézd meg a függőben lévő meghívásaidat!
+    </mat-card-content>
+  </mat-card>
+
+</ng-container>
+
+<ng-container *ngIf="containerGroups && containerGroups.length">
+  <button mat-raised-button style="width:100%" color="primary" (click)="showCreateNewIdea()">Új ötlet kiírása</button>
+  <!-- Filters -->
+  <div class="d-flex flex-row align-items-center flex-wrap" style="margin-top:1em;">
+    <mat-card class="flex-grow-1">
+      <mat-card-title>
+        <h3>
+          Ajándéklisták
+        </h3>
+      </mat-card-title>
+      <mat-card-content>
+        <!-- <h4>
         Listák
       </h4> -->
-      <div class="d-flex align-items-center flex-wrap">
-        <button mat-raised-button color="primary" (click)="showMyList()">
-          Saját listám
-        </button>
-        <div style="margin-left:1em; margin-top:3px; margin-bottom:3px;">
-          <button mat-raised-button [matMenuTriggerFor]="selectUserListMenu" >
-            Lista kiválasztása
+        <div class="d-flex align-items-center flex-wrap">
+          <button mat-raised-button color="primary" (click)="showMyList()">
+            Saját listám
           </button>
-          <mat-menu #selectUserListMenu>
-            <button mat-menu-item *ngFor="let uid of usersInAllContainerGroups" (click)="showUserList(uid)">
-              <kariaji-user-avatar [userId]="uid"></kariaji-user-avatar>
+          <div style="margin-left:1em; margin-top:3px; margin-bottom:3px;">
+            <button mat-raised-button [matMenuTriggerFor]="selectUserListMenu">
+              Lista kiválasztása
             </button>
-          </mat-menu>
+            <mat-menu #selectUserListMenu>
+              <button mat-menu-item *ngFor="let uid of usersInAllContainerGroups" (click)="showUserList(uid)">
+                <kariaji-user-avatar [userId]="uid"></kariaji-user-avatar>
+              </button>
+            </mat-menu>
+          </div>
+          <button mat-raised-button color="accent" (click)="showAll()" style="margin-left:1em; margin-top:3px; margin-bottom:3px;">
+            Összes ötlet, amit láthatok
+          </button>
         </div>
-        <button mat-raised-button color="accent" (click)="showAll()" style="margin-left:1em; margin-top:3px; margin-bottom:3px;">
-          Összes ötlet, amit láthatok
-        </button>
-      </div>
 
-      <!-- <mat-divider style="margin-top:1em; margin-bottom:1em;" [inset]="true"></mat-divider> -->
+        <!-- <mat-divider style="margin-top:1em; margin-bottom:1em;" [inset]="true"></mat-divider> -->
+        <div class="d-flex align-items-center">
+          <h4 style="margin-top:1em;" class="flex-grow-1">
+            Részletes kereső
+          </h4>
+          <button mat-mini-fab (click)=" refreshList()" style="margin-left:1em;margin-top:4px;margin-bottom:4px; margin-right:4px;">
+            <mat-icon>refresh</mat-icon>
+          </button>
+        </div>
+        <h5>Csoportok</h5>
+        <mat-divider [inset]="true"></mat-divider>
+        <br />
+        <kariaji-group-list-selector [groups]="containerGroupIds$ | async" [(selectedGroups)]="filters.groupIds"></kariaji-group-list-selector>
 
-      <h4 style="margin-top:1em;">
-        Részletes kereső
-      </h4>
-      <h5>Csoportok</h5>
-      <mat-divider [inset]="true"></mat-divider>
-      <br />
-      <kariaji-group-list-selector [groups]="containerGroupIds$ | async" [(selectedGroups)]="filters.groupIds"></kariaji-group-list-selector>
+        <h5 style="margin-top:1em;">Címzettek</h5>
+        <mat-divider [inset]="true"></mat-divider>
+        <br />
+        <kariaji-user-list-selector #filteredUserIdsSelector [users]="userIdsInFilteredGroups" [(selectedUsers)]="filters.userIds"></kariaji-user-list-selector>
 
-      <h5 style="margin-top:1em;">Címzettek</h5>
-      <mat-divider [inset]="true"></mat-divider>
-      <br />
-      <kariaji-user-list-selector #filteredUserIdsSelector [users]="userIdsInFilteredGroups" [(selectedUsers)]="filters.userIds"></kariaji-user-list-selector>
+        <br />
+        <h5>További beállítások</h5>
+        <mat-divider [inset]="true"></mat-divider>
+        <br />
+        <mat-checkbox [(ngModel)]="filters.onlyNotReserved"> Csak a szabad ötletek mutatása </mat-checkbox>
+        <br />
+        <mat-checkbox [(ngModel)]="filters.onlyReservedByMe"> Csak azon ötletek mutatása, amiket lefoglaltam </mat-checkbox>
+        <br />
+        <mat-checkbox [(ngModel)]="filters.onlySentByMe"> Csak azon ötletek mutatása, amiket én küldtem be</mat-checkbox>
+        <br />
+        <div class="d-flex align-items-center">
+          Oldalméret:
+          <mat-select placeholder="{{filters.take}}" style="margin-left:1em; width:50px;" [(ngModel)]="take">
+            <mat-option value="10">10</mat-option>
+            <mat-option value="30">30</mat-option>
+            <mat-option value="50">50</mat-option>
+            <mat-option value="100">100</mat-option>
+          </mat-select>
+        </div>
+      </mat-card-content>
+    </mat-card>
 
-      <br />
-      <h5>További beállítások</h5>
-      <mat-divider [inset]="true"></mat-divider>
-      <br />
-      <mat-checkbox [(ngModel)]="filters.onlyNotReserved"> Csak a szabad ötletek mutatása </mat-checkbox>
-      <br />
-      <mat-checkbox [(ngModel)]="filters.onlyReservedByMe"> Csak azon ötletek mutatása, amiket lefoglaltam </mat-checkbox>
-      <br />
-      <mat-checkbox [(ngModel)]="filters.onlySentByMe"> Csak azon ötletek mutatása, amiket én küldtem be</mat-checkbox>
-      <br />
-      <div class="d-flex align-items-center">
-        Oldalméret:
-        <mat-select placeholder="{{filters.take}}" style="margin-left:1em; width:50px;" [(ngModel)]="take">
-          <mat-option value="10">10</mat-option>
-          <mat-option value="30">30</mat-option>
-          <mat-option value="50">50</mat-option>
-          <mat-option value="100">100</mat-option>
-        </mat-select>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  <button mat-mini-fab (click)=" refreshList()" style="margin-left:1em;margin-top:4px;margin-right:4px;">
-    <mat-icon>refresh</mat-icon>
-  </button>
-</div>
+  </div>
 
-<mat-spinner style="margin-top:1em;" *ngIf="showSpinner"></mat-spinner>
+  <mat-spinner style="margin-top:1em;" *ngIf="showSpinner"></mat-spinner>
 
-<ng-container *ngIf="(ideas$ | async) && (ideas$ | async).length">
-  <br />
-  <mat-card>
-    <mat-card-content>
-      <div class="d-flex flex-row align-items-center">
-        <button (click)="navigateToFirstPage()" mat-mini-fab matTooltip="Első oldal" *ngIf="page > 0">
-          <mat-icon>first_page</mat-icon>
-        </button>
-        <button *ngIf="page > 0" (click)="navigateToPreviousPage()" mat-mini-fab matTooltip="Előző oldal">
-          <mat-icon>navigate_before</mat-icon>
-        </button>
-        <span class="flex-grow-1"></span>
-        <span>
-          {{page+1}}. oldal ({{page * filters.take + 1}} - {{maxIndexOfShownIdeas}})
-        </span>
-        <span class="flex-grow-1"></span>
-        <button (click)="navigateToNextPage()" *ngIf="hasMore" mat-mini-fab matTooltip="Következő oldal">
-          <mat-icon>navigate_next</mat-icon>
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  <br />
-</ng-container>
+  <ng-container *ngIf="(ideas$ | async) && (ideas$ | async).length">
+    <br />
+    <mat-card>
+      <mat-card-content>
+        <div class="d-flex flex-row align-items-center">
+          <button (click)="navigateToFirstPage()" mat-mini-fab matTooltip="Első oldal" *ngIf="page > 0">
+            <mat-icon>first_page</mat-icon>
+          </button>
+          <button *ngIf="page > 0" (click)="navigateToPreviousPage()" mat-mini-fab matTooltip="Előző oldal">
+            <mat-icon>navigate_before</mat-icon>
+          </button>
+          <span class="flex-grow-1"></span>
+          <span>
+            {{page+1}}. oldal ({{page * filters.take + 1}} - {{maxIndexOfShownIdeas}})
+          </span>
+          <span class="flex-grow-1"></span>
+          <button (click)="navigateToNextPage()" *ngIf="hasMore" mat-mini-fab matTooltip="Következő oldal">
+            <mat-icon>navigate_next</mat-icon>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    <br />
+  </ng-container>
 
-<ng-container *ngFor="let idea of (ideas$ | async)">
-  <br />
-  <mat-card>
-    <mat-card-content>
+  <ng-container *ngFor="let idea of (ideas$ | async)">
+    <br />
+    <mat-card>
+      <mat-card-content>
 
 
-      <div class="d-flex flex-row align-items-center flex-wrap">
-        <!-- Ez az ötlet nekik szól: -->
         <div class="d-flex flex-row align-items-center flex-wrap">
-          <kariaji-user-avatar [size]="30" style="margin-left: 3px;" [userId]="id" *ngFor="let id of idea.targetUserIds"></kariaji-user-avatar>
-        </div>
-        <span class="flex-grow-1">&nbsp;</span>
-        <span class="badge badge-pill badge-secondary" style="font-size: normal">{{idea.creationTime}}</span>
-        <button style="margin-left:1em;" color="accent" mat-mini-fab title="Részletek" (click)="showDetailsOfIdea(idea)">
-          <mat-icon [matBadge]="idea.comments ? idea.comments.length : ''" [matBadgeHidden]="!idea.comments || !idea.comments.length" matBadgeColor="primary">info</mat-icon>
-        </button>
+          <!-- Ez az ötlet nekik szól: -->
+          <div class="d-flex flex-row align-items-center flex-wrap">
+            <kariaji-user-avatar [size]="30" style="margin-left: 3px;" [userId]="id" *ngFor="let id of idea.targetUserIds"></kariaji-user-avatar>
+          </div>
+          <span class="flex-grow-1">&nbsp;</span>
+          <span class="badge badge-pill badge-secondary" style="font-size: normal">{{idea.creationTime}}</span>
+          <button style="margin-left:1em;" color="accent" mat-mini-fab title="Részletek" (click)="showDetailsOfIdea(idea)">
+            <mat-icon [matBadge]="idea.comments ? idea.comments.length : ''" [matBadgeHidden]="!idea.comments || !idea.comments.length" matBadgeColor="primary">info</mat-icon>
+          </button>
 
-      </div>
-      <div style="margin-top:8px"></div>
-      <mat-divider [inset]="true"></mat-divider>
-      <div style="margin-top:8px"></div>
-      <!-- <span style="font-size:smaller;border-bottom:1px solid lightgray">{{idea.creationTime}}</span> -->
-      <div class="d-md-flex flex-row align-items-center flex-wrap">
-        <!-- <div class="d-flex flex-column" style="padding-right: 1em; border-right: 1px solid lightgray; " title="Címzettek">
+        </div>
+        <div style="margin-top:8px"></div>
+        <mat-divider [inset]="true"></mat-divider>
+        <div style="margin-top:8px"></div>
+        <!-- <span style="font-size:smaller;border-bottom:1px solid lightgray">{{idea.creationTime}}</span> -->
+        <div class="d-md-flex flex-row align-items-center flex-wrap">
+          <!-- <div class="d-flex flex-column" style="padding-right: 1em; border-right: 1px solid lightgray; " title="Címzettek">
           <kariaji-user-avatar style="margin-top:4px;" [userId]="id" *ngFor="let id of idea.targetUserIds"></kariaji-user-avatar>
         </div> -->
-        <!-- <mat-icon style="margin-top:4px;">drag_indicator</mat-icon> -->
-        <div style="margin-left:1em;margin-top:4px;" class="align-self-center flex-grow-1 user-text" [innerHtml]="getText(idea.textDelta)"></div>
-        <!-- <button style="margin-left:auto;" *ngIf="isReservationButtonVisible(idea)" [disabled]="isReservationButtonDisabled(idea)"  mat-raised-button>{{getReservationButtonText(idea)}}</button> -->
+          <!-- <mat-icon style="margin-top:4px;">drag_indicator</mat-icon> -->
+          <div style="margin-left:1em;margin-top:4px;" class="align-self-center flex-grow-1 user-text" [innerHtml]="getText(idea.textDelta)"></div>
+          <!-- <button style="margin-left:auto;" *ngIf="isReservationButtonVisible(idea)" [disabled]="isReservationButtonDisabled(idea)"  mat-raised-button>{{getReservationButtonText(idea)}}</button> -->
 
-        <div class="d-flex flex-column align-items-end">
-          <button *ngIf="canReserve(idea) && !idea.isReserved" mat-raised-button color="accent" (click)="reserve(idea)">Lefoglalom</button>
-          <button mat-button color="warn" *ngIf="canReserve(idea) && idea.isReserved && !idea.reservation">Más már lefoglalta</button>
-          <button *ngIf="canReserve(idea) && idea.reservation && idea.reservation && (idea.reservation.reserverUserId !== userId)" mat-button [matBadge]="idea.reservation.joinedUserIds ? idea.reservation.joinedUserIds.length : 0" [matBadgeHidden]="!idea.reservation.canJoin" (click)="idea.reservation.canJoin && showJoinedUsers(idea.reservation)">
-            <div class="d-flex flex-row align-items-center">
-              <kariaji-user-avatar size="30" [userId]="idea.reservation.reserverUserId"></kariaji-user-avatar>
-              <span>&nbsp;már lefoglalta{{getTextIfCanJoinForOthersReservation(idea.reservation)}}</span>
+          <div class="d-flex flex-column align-items-end">
+            <button *ngIf="canReserve(idea) && !idea.isReserved" mat-raised-button color="accent" (click)="reserve(idea)">Lefoglalom</button>
+            <button mat-button color="warn" *ngIf="canReserve(idea) && idea.isReserved && !idea.reservation">Más már lefoglalta</button>
+            <button *ngIf="canReserve(idea) && idea.reservation && idea.reservation && (idea.reservation.reserverUserId !== userId)" mat-button [matBadge]="idea.reservation.joinedUserIds ? idea.reservation.joinedUserIds.length : 0" [matBadgeHidden]="!idea.reservation.canJoin" (click)="idea.reservation.canJoin && showJoinedUsers(idea.reservation)">
+              <div class="d-flex flex-row align-items-center">
+                <kariaji-user-avatar size="30" [userId]="idea.reservation.reserverUserId"></kariaji-user-avatar>
+                <span>&nbsp;már lefoglalta{{getTextIfCanJoinForOthersReservation(idea.reservation)}}</span>
+              </div>
+            </button>
+            <button mat-raised-button style="margin-top:1em;" *ngIf=" idea.reservation && idea.reservation.canJoin && (idea.reservation.reserverUserId !== userId) && !isUserJoined(idea.reservation)" (click)="join(idea.reservation)">
+              Csatlakozom
+            </button>
+            <button mat-raised-button *ngIf="idea.reservation && isUserJoined(idea.reservation)" (click)="removeJoin(idea.reservation, userId)">
+              Csatlakoztam, de visszalépek
+            </button>
+            <div *ngIf="canReserve(idea) && idea.reservation && (idea.reservation.reserverUserId === userId)" class="d-flex flex-column">
+              <button color="warn" mat-raised-button (click)="deleteReservation(idea)">
+                <mat-icon>delete</mat-icon>
+                Visszavonom a foglalást
+              </button>
+              <mat-slide-toggle style="margin-top:1em" color="primary" [checked]="idea.reservation.canJoin" (change)="updateCanJoin(idea.reservation)">
+                Lehet csatlakozni?
+              </mat-slide-toggle>
+              <button style="margin-top:1em" mat-raised-button *ngIf="(idea.reservation.joinedUserIds && idea.reservation.joinedUserIds.length)" matBadge="{{idea.reservation.joinedUserIds ? idea.reservation.joinedUserIds.length : 0}}" (click)="showJoinedUsers(idea.reservation)">
+                Csatlakozások
+              </button>
             </div>
-          </button>
-          <button mat-raised-button style="margin-top:1em;" *ngIf=" idea.reservation && idea.reservation.canJoin && (idea.reservation.reserverUserId !== userId) && !isUserJoined(idea.reservation)" (click)="join(idea.reservation)">
-            Csatlakozom
-          </button>
-          <button mat-raised-button *ngIf="idea.reservation && isUserJoined(idea.reservation)" (click)="removeJoin(idea.reservation, userId)">
-            Csatlakoztam, de visszalépek
-          </button>
-          <div *ngIf="canReserve(idea) && idea.reservation && (idea.reservation.reserverUserId === userId)" class="d-flex flex-column">
-            <button color="warn" mat-raised-button (click)="deleteReservation(idea)">
-              <mat-icon>delete</mat-icon>
-              Visszavonom a foglalást
-            </button>
-            <mat-slide-toggle style="margin-top:1em" color="primary" [checked]="idea.reservation.canJoin" (change)="updateCanJoin(idea.reservation)">
-              Lehet csatlakozni?
-            </mat-slide-toggle>
-            <button style="margin-top:1em" mat-raised-button *ngIf="(idea.reservation.joinedUserIds && idea.reservation.joinedUserIds.length)" matBadge="{{idea.reservation.joinedUserIds ? idea.reservation.joinedUserIds.length : 0}}" (click)="showJoinedUsers(idea.reservation)">
-              Csatlakozások
-            </button>
           </div>
         </div>
-      </div>
-    </mat-card-content>
-  </mat-card>
+      </mat-card-content>
+    </mat-card>
+  </ng-container>
+
+  <ng-container *ngIf="(ideas$ | async) && !(ideas$ | async).length">
+    <mat-card style="margin-top:1em;">
+      <mat-card-title>Nincs találat</mat-card-title>
+      <mat-card-content>
+        <!-- <span style="margin-top:1em;">Nincs találat</span> -->
+      </mat-card-content>
+    </mat-card>
+
+  </ng-container>
+
+  <ng-container *ngIf="(ideas$ | async) && (ideas$ | async).length">
+    <br />
+    <mat-card>
+      <mat-card-content>
+        <div class="d-flex flex-row align-items-center">
+          <button (click)="navigateToFirstPage()" mat-mini-fab matTooltip="Első oldal" *ngIf="page > 0">
+            <mat-icon>first_page</mat-icon>
+          </button>
+          <button *ngIf="page > 0" (click)="navigateToPreviousPage()" mat-mini-fab matTooltip="Előző oldal">
+            <mat-icon>navigate_before</mat-icon>
+          </button>
+          <span class="flex-grow-1"></span>
+          <span>
+            {{page+1}}. oldal ({{page * filters.take + 1}} - {{maxIndexOfShownIdeas}})
+          </span>
+          <span class="flex-grow-1"></span>
+          <button (click)="navigateToNextPage()" *ngIf="hasMore" mat-mini-fab matTooltip="Következő oldal">
+            <mat-icon>navigate_next</mat-icon>
+          </button>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    <br />
+  </ng-container>
+
 </ng-container>
-
-<ng-container *ngIf="(ideas$ | async) && !(ideas$ | async).length">
-  <span style="margin-top:1em;">Nincs találat</span>
-
-</ng-container>
-
-<ng-container *ngIf="(ideas$ | async) && (ideas$ | async).length">
-  <br />
-  <mat-card>
-    <mat-card-content>
-      <div class="d-flex flex-row align-items-center">
-        <button (click)="navigateToFirstPage()" mat-mini-fab matTooltip="Első oldal" *ngIf="page > 0">
-          <mat-icon>first_page</mat-icon>
-        </button>
-        <button *ngIf="page > 0" (click)="navigateToPreviousPage()" mat-mini-fab matTooltip="Előző oldal">
-          <mat-icon>navigate_before</mat-icon>
-        </button>
-        <span class="flex-grow-1"></span>
-        <span>
-          {{page+1}}. oldal ({{page * filters.take + 1}} - {{maxIndexOfShownIdeas}})
-        </span>
-        <span class="flex-grow-1"></span>
-        <button (click)="navigateToNextPage()" *ngIf="hasMore" mat-mini-fab matTooltip="Következő oldal">
-          <mat-icon>navigate_next</mat-icon>
-        </button>
-      </div>
-    </mat-card-content>
-  </mat-card>
-  <br />
-</ng-container>
-
-
 <ng-template #joinedUsersDialogTemplate>
   <h2 mat-dialog-title>
     {{(detailedReservation && detailedReservation.joinedUserIds && detailedReservation.joinedUserIds.length ) ? 'Eddig csatlakoztak' : 'Még nem csatlakozott senki'}}

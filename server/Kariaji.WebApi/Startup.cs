@@ -37,7 +37,7 @@ namespace Kariaji.WebApi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connection = @"Server=(localdb)\kariaji;Database=kariajiBeta;Trusted_Connection=True;ConnectRetryCount=0";
+            var connection = Configuration.GetConnectionString("KariajiDatabase");
 
             services.AddDbContext<KariajiContext>
                 (options => options.UseSqlServer(connection));

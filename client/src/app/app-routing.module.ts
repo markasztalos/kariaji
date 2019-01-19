@@ -25,6 +25,7 @@ const routes: Routes = [
       { path: 'group/:id', component: GroupEditorComponent },
       // { path: 'mylist', component: MylistComponent },
       { path: 'ideas', component: IdeasListComponent },
+      { path: '', redirectTo: 'ideas', pathMatch: 'full' }
       // { path: 'gifts', component: GiftsComponent }
     ]
   },
