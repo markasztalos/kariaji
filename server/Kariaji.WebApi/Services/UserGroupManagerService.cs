@@ -165,7 +165,7 @@ namespace Kariaji.WebApi.Services
         public async Task<bool> IsMemberOfGroups(IReadOnlyCollection<int> groupIds, int userId)
         {
             var gids = await ctx.Groups.Where(g =>
-                groupIds.Contains(g.Id) && g.Memberships.Any(m => m.UserId == userId && !m.IsDeleted)).Select(g=>g.Id).ToListAsync();
+                groupIds.Contains(g.Id) && g.Memberships.Any(m => m.UserId == userId && !m.IsDeleted)).Select(g => g.Id).ToListAsync();
             return gids.Count == groupIds.Count;
         }
 
@@ -266,9 +266,12 @@ namespace Kariaji.WebApi.Services
 
         public async Task<bool> AreUsersFriends(int u1, int u2)
         {
-            return await this.ctx.Groups.AnyAsync(g =>
-                g.Memberships.Any(m => !m.IsDeleted && m.UserId == u1) &&
-                g.Memberships.Any(m => !m.IsDeleted && m.UserId == u2));
+            return (await this.ctx.Groups.AnyAsync(g =>
+                       g.Memberships.Any(m => !m.IsDeleted && m.UserId == u1) &&
+                       g.Memberships.Any(m => !m.IsDeleted && m.UserId == u2))) ||
+                   (await ctx.Supervisions.AnyAsync(m =>
+                       (m.ManagedId == u1 && m.ManagerId == u2) ||
+                       (m.ManagedId == u2 && m.ManagerId == u1)));
         }
 
         public async Task<Membership> UpdateMembership(int groupId, int userId, bool isAdmin)
@@ -293,11 +296,13 @@ namespace Kariaji.WebApi.Services
 
         public async Task<List<Group>> GetContainerGroupsAsync(int currentUserId)
         {
-            return await this.ctx.Groups
+            var groups = await this.ctx.Groups
                 .Include(g => g.Memberships)
                 .ThenInclude(m => m.User)
-                .Where(g => g.Memberships.Any(m => m.UserId == currentUserId && !m.IsDeleted))
+                .Where(g => !g.IsDeleted && g.Memberships.Any(m => m.UserId == currentUserId && !m.IsDeleted && !m.User.IsDeleted))
                 .ToListAsync();
+            groups.ForEach(g => g.Memberships = g.Memberships.Where(m => !m.IsDeleted && !m.User.IsDeleted).ToList());
+            return groups;
         }
 
         public async Task<List<int>> GetContainerGroupIdsAsync(int currentUserId)
@@ -305,7 +310,7 @@ namespace Kariaji.WebApi.Services
             return await this.ctx.Groups
                 .Include(g => g.Memberships)
                 .ThenInclude(m => m.User)
-                .Where(g => g.Memberships.Any(m => m.UserId == currentUserId && !m.IsDeleted))
+                .Where(g => !g.IsDeleted && g.Memberships.Any(m => m.UserId == currentUserId && !m.IsDeleted && !m.User.IsDeleted))
                 .Select(g => g.Id)
                 .ToListAsync();
         }
@@ -313,34 +318,39 @@ namespace Kariaji.WebApi.Services
         public async Task<List<int>> GetFriendUserIds(int currentUserId)
         {
             var userIds = await
-                ctx.Groups.Where(g => !g.IsDeleted && g.Memberships.Any(m => !m.IsDeleted && m.UserId == currentUserId))
+                ctx.Groups.Where(g => !g.IsDeleted &&
+                                      g.Memberships.Any(m => !m.IsDeleted && m.UserId == currentUserId))
                     .SelectMany(g => g.Memberships.Where(m => !m.IsDeleted).Select(m => m.UserId)).ToListAsync();
-            return userIds;
+            var managedUserIds = await ctx.Users
+                .Where(u => !u.IsDeleted && u.IsManaged && u.ManagerSupervisions.Any(m => m.ManagerId == currentUserId)).Select(u => u.Id).ToListAsync();
+            return userIds.Concat(managedUserIds).Distinct().ToList();
         }
 
         public async Task<bool> IsManagedUserNameFree(int managerUserId, string displayName)
         {
             var displayNameToLower = displayName.ToLower().Trim();
-            return !await ctx.Users.AnyAsync(u =>
-                u.IsManaged && u.ManagerUsers.Any(m => m.ManagerUserId == managerUserId) &&
-                u.DisplayName.ToLower() == displayName);
+            return !await ctx.Users.AnyAsync(u => !u.IsDeleted &&
+                u.IsManaged && u.ManagerSupervisions.Any(m => m.ManagerId == managerUserId) &&
+                u.DisplayName.ToLower() == displayNameToLower);
         }
 
         public async Task<User> CreateManagedUserAsync(int managerUserId, string displayName)
         {
-            
+
             var user = new User
             {
                 DisplayName = displayName,
                 IsManaged = true,
             };
-            var management = new UserManagement
-            {
-                ManagedUser = user,
-                ManagerUserId = managerUserId
-            };
-            user.ManagerUsers.Add(management);
             this.ctx.Users.Add(user);
+            await this.ctx.SaveChangesAsync();
+
+            var management = new Supervision
+            {
+                ManagedId = user.Id,
+                ManagerId = managerUserId
+            };
+            ctx.Supervisions.Add(management);
             await this.ctx.SaveChangesAsync();
             return user;
         }
@@ -348,8 +358,8 @@ namespace Kariaji.WebApi.Services
 
         public async Task<bool> IsManagerOfUser(int managerUserId, int managedUserId)
         {
-            return await this.ctx.UserManagements.AnyAsync(m =>
-                m.ManagedUserId == managedUserId && m.ManagerUserId == managerUserId && !m.ManagerUser.IsDeleted);
+            return await this.ctx.Supervisions.AnyAsync(m =>
+                m.ManagedId == managedUserId && m.ManagerId == managerUserId && !m.ManagerUser.IsDeleted);
         }
 
 
@@ -365,51 +375,91 @@ namespace Kariaji.WebApi.Services
 
 
 
-        public async Task AddManagerToUser(int managedUserId, int managerUserId)
+        public async Task AddManagerToUser(int managerUserId, int managedUserId)
         {
-            var management = new UserManagement
+            var management = new Supervision
             {
-                ManagedUserId = managedUserId,
-                ManagerUserId = managerUserId
+                ManagedId = managedUserId,
+                ManagerId = managerUserId
             };
-            ctx.UserManagements.Add(management);
+            ctx.Supervisions.Add(management);
             await ctx.SaveChangesAsync();
         }
 
-        
+
         public async Task<bool> CanRemoveManagerOfUser(int currentUserId, int managerUserId, int managedUserId)
         {
             return await this.IsManagerOfUser(currentUserId, managedUserId) &&
-                   (managerUserId == currentUserId ? 
-                    ((await this.ctx.UserManagements.Where(m => m.ManagedUserId ==managedUserId).CountAsync()) > 1)
+                   (managerUserId == currentUserId ?
+                    ((await this.ctx.Supervisions.Where(m => m.ManagedId == managedUserId).CountAsync()) > 1)
                    : (await this.IsManagerOfUser(managerUserId, managedUserId))
                    );
         }
 
         public async Task RemoveManagerOfUser(int managerUserId, int managedUserId)
         {
-            var management = await ctx.UserManagements.FirstOrDefaultAsync(m =>
-                m.ManagedUserId == managerUserId && m.ManagedUserId == managedUserId);
-            ctx.UserManagements.Remove(management);
+            var management = await ctx.Supervisions.FirstOrDefaultAsync(m =>
+                m.ManagerId == managerUserId && m.ManagedId == managedUserId);
+            ctx.Supervisions.Remove(management);
             await ctx.SaveChangesAsync();
         }
 
         public async Task<Membership> AddManagedUserToGroup(int managedUserId, int groupId)
         {
-            var m = new Membership
+            var membership = await ctx.Memberships.FirstOrDefaultAsync(m =>
+                m.GroupId == groupId && m.UserId == managedUserId && m.IsDeleted);
+            if (membership != null)
             {
-                UserId = managedUserId,
-                GroupId = groupId,
-                IsAdministrator = false,
-                IsDeleted = false
-            };
-            this.ctx.Memberships.Add(m);
+                membership.IsDeleted = false;
+            }
+            else
+            {
+                membership = new Membership
+                {
+                    UserId = managedUserId,
+                    GroupId = groupId,
+                    IsAdministrator = false,
+                    IsDeleted = false
+                };
+                this.ctx.Memberships.Add(membership);
+            }
+
             await this.ctx.SaveChangesAsync();
-            return m;
+            return membership;
+        }
+
+        public async Task<List<ManagedUserdata>> GetManagedUsers(int managerUserId)
+        {
+            return (await ctx.Users.Where(u =>
+                !u.IsDeleted && u.IsManaged && u.ManagerSupervisions.Any(m => m.ManagerId == managerUserId))
+                .Select(user => new
+                {
+                    user.Id,
+                    user.DisplayName,
+                    ManagerUserIds = user.ManagerSupervisions.Select(m => m.ManagerId),
+                    ContainerGroupIds = user.Memberships.Where(m => !m.IsDeleted).Select(m => m.GroupId)
+                })
+                .ToListAsync())
+                .Select(user =>
+                new ManagedUserdata
+                {
+                    Id = user.Id,
+                    DisplayName = user.DisplayName,
+                    ManagerUserIds = user.ManagerUserIds.ToList(),
+                    ContainerGroupIds = user.ContainerGroupIds.ToList()
+                }).ToList();
         }
 
 
-        
+
+    }
+
+    public class ManagedUserdata
+    {
+        public string DisplayName { get; set; }
+        public int Id { get; set; }
+        public List<int> ManagerUserIds { get; set; }
+        public List<int> ContainerGroupIds { get; set; }
     }
 
 }

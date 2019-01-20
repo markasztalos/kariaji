@@ -141,7 +141,7 @@ namespace Kariaji.WebApi
 
 
             using (var serviceScope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope())
-            {
+            { 
                 var defaultConfigurationProviderService = serviceScope.ServiceProvider.GetRequiredService<ConfigurationProviderService>();
                 var context = serviceScope.ServiceProvider.GetRequiredService<KariajiContext>();
                 context.Database.EnsureCreated();

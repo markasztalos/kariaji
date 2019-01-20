@@ -54,7 +54,7 @@ namespace Kariaji.WebApi.DAL
         public int? InvitedUserId { get; set; }
 
         public User SenderUser { get;set; }
-        [ForeignKey(nameof(SenderUserId))]
+        [ForeignKey(nameof(SenderUser))]
         public int SenderUserId { get;set; }
         public string InvitedEmail { get; set; }
         public DateTime SendingDate { get; set; }

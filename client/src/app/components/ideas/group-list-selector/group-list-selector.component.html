@@ -1,4 +1,5 @@
-<div class="d-flex align-items-center" *ngIf="groups">
+<mat-spinner *ngIf="spinning"></mat-spinner>
+<div class="d-flex align-items-center" *ngIf="groups && !spinning">
   <div>
     <button mat-mini-fab [matMenuTriggerFor]="addGroupMenu" title="Csoport hozzáadása" [disabled]="!selectableGroups.length">
       <mat-icon>group_add</mat-icon>

@@ -1,4 +1,5 @@
-<div class="d-flex align-items-center" *ngIf="users">
+<mat-spinner *ngIf="spinning"></mat-spinner>
+<div class="d-flex align-items-center" *ngIf="users && !spinning">
   <div>
     <button mat-mini-fab [matMenuTriggerFor]="addUserMenu" title="Csoport hozzáadása" [disabled]="!selectableUsers.length">
       <mat-icon>person_add</mat-icon>
@@ -15,7 +16,7 @@
   <div class="d-flex align-items-center flex-wrap">
     <button color="warn" style="margin-left:3px; margin-top:2px;margin-bottom:2px; padding-left:4px;padding-right:4px;" mat-button *ngFor="let g of selectedUsers" (click)="removeUser(g)">
       <div class="d-flex align-items-center ">
-        <mat-icon>delete</mat-icon>
+        <mat-icon *ngIf="canDeleteUser(g)" >delete</mat-icon>
         <kariaji-user-avatar [userId]="g"></kariaji-user-avatar>
       </div>
     </button>

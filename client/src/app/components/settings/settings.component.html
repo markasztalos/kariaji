@@ -2,7 +2,16 @@
     <div class="col-md-6 col-sm-12" style="margin-bottom:1em">
         <kariaji-my-account style="width:100%;"></kariaji-my-account>
         <br />
-        <kariaji-avatar-selector style="width:100%;"></kariaji-avatar-selector>
+        <mat-card class="w-100">
+            <mat-card-title>
+                Kép feltöltése
+            </mat-card-title>
+            <mat-card-content>
+                <kariaji-avatar-selector [userId]="userId$ | async" style="width:100%;"></kariaji-avatar-selector>
+            </mat-card-content>
+            <mat-card-actions>
+            </mat-card-actions>
+        </mat-card>
     </div>
 
 

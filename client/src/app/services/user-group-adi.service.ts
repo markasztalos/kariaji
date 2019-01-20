@@ -2,7 +2,7 @@ import { Injectable } from "@angular/core";
 import { ApiBaseService, buildUrl } from "./api-base-service";
 import { HttpClient } from "@angular/common/http";
 import { MatSnackBar } from "@angular/material/snack-bar";
-import { OwnMembership, CompactGroup, Group, UserGroupInvitation, CompactUser, FriendsData } from "../models/models";
+import { OwnMembership, CompactGroup, Group, UserGroupInvitation, CompactUser, FriendsData, IManagedUserData } from "../models/models";
 import { Observable } from "rxjs";
 import { KariajiDialogsService } from "./dialogs.service";
 
@@ -77,21 +77,42 @@ export class UserGroupApiService extends ApiBaseService {
         return this.get(`friends`);
     }
 
-
-    public createManagedUser(displayName: string) : Observable<any> {
-        return this.post(`managed-users?displayName=${displayName}`, {});
+    public getManagedUsers(): Observable<IManagedUserData[]> {
+        return this.get(`managed-users`);
     }
-    public deleteManagedUser(managedUserId : number) {
+
+
+    public createManagedUser(displayName: string): Observable<CompactUser> {
+        return this.post(`managed-users`, { displayName });
+    }
+    public deleteManagedUser(managedUserId: number) {
         return this.delete(`managed-users/${managedUserId}`);
     }
-    public addManagerToUser(managerUserId : number, managedUserId : number) {
-        return this.post(`managed-users/${managedUserId}/managers`, {});
+    public addManagerToUser(managerUserId: number, managedUserId: number) {
+        return this.post(`managed-users/${managedUserId}/managers`, { managerUserId });
     }
-    public removeManagerOfUser(managerUserId : number, managedUserId : number) {
-        return this.delete(`managed-users/{managedUserId}/managers/${managerUserId}`);
+    public removeManagerOfUser(managerUserId: number, managedUserId: number) {
+        return this.delete(`managed-users/${managedUserId}/managers/${managerUserId}`);
     }
-    public async addManagedUserToGroup(managedUserId : number, groupId : number)
-    {
-        return this.put(`managed-users/${managedUserId}/groups/{groupId}`, {});
+    public addManagedUserToGroup(managedUserId: number, groupId: number) {
+        return this.put(`managed-users/${managedUserId}/groups/${groupId}`, { groupId });
+    }
+    public updateManagedAccount(userId: number, displayName: string) {
+        return this.put(`users/${userId}`, {
+            displayName
+        });
+    }
+
+    public updateAvatarOfManagedUser(userId: number, file: File): Observable<any> {
+        const formData = new FormData();
+        formData.append('image', file);
+        return this.put(`managed-users/${userId}/avatar`, formData);
+
+    }
+    public deleteAvatarOfManagedUser(userId: number): Observable<any> {
+        return this.delete(`managed-users/${userId}/avatar`);
+    }
+    public removeManagedUserFromGroup(managedUserId: number, groupId: number) {
+        return this.delete(`managed-users/${managedUserId}/groups/${groupId}`);
     }
 }

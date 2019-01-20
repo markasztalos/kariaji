@@ -50,7 +50,7 @@ namespace Kariaji.WebApi.Models
             Email = user.Email,
             Id = user.Id,
             IsManaged = user.IsManaged,
-            ManagerUserIds = user.ManagerUsers?.Select(u =>u.ManagerUserId).ToList()
+            ManagerUserIds = user.ManagerSupervisions?.Select(u =>u.ManagerId).ToList()
         };
 
         public static OwnMembershipInfo ToOwnMembershipInfo(this Membership membership)
@@ -64,6 +64,8 @@ namespace Kariaji.WebApi.Models
             };
         }
     }
+
+    
 
     public class CompactUserInfo
     {

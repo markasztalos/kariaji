@@ -21,7 +21,7 @@ namespace Kariaji.WebApi.Controllers
         }
 
         [HttpPut]
-        public async Task<ActionResult<CompactUserInfo>> UpdateAccount([FromBody]UpdateMyAccountModel model)
+        public async Task<ActionResult<CompactUserInfo>> UpdateAccount([FromBody]UpdateAccountModel model)
         {
             if (!this.ModelState.IsValid)
                 return BadRequest(CommonResult.NewError());

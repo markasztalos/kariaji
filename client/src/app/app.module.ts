@@ -1,3 +1,5 @@
+
+import {MatTableModule} from '@angular/material/table';
 import {MatExpansionModule} from '@angular/material/expansion';
 
 import {MatSelectModule} from '@angular/material/select';
@@ -69,6 +71,8 @@ import { EditIdeaComponent } from './components/ideas/edit-idea/edit-idea.compon
 import { GroupListSelectorComponent } from './components/ideas/group-list-selector/group-list-selector.component';
 import { UserListSelectorComponent } from './components/ideas/user-list-selector/user-list-selector.component';
 import { FriendsService } from './services/friends.service';
+import { ManagedUsersEditorComponent } from './components/managed-users/managed-users-editor/managed-users-editor.component';
+import { DocComponent } from './components/common/doc.component';
 
 
 
@@ -97,6 +101,8 @@ import { FriendsService } from './services/friends.service';
     EditIdeaComponent,
     GroupListSelectorComponent,
     UserListSelectorComponent,
+    ManagedUsersEditorComponent,
+    DocComponent,
 
   ],
   imports: [
@@ -123,6 +129,7 @@ import { FriendsService } from './services/friends.service';
     FontAwesomeModule,
     MatSelectModule,
     MatTooltipModule,
+    MatTableModule,
     MatExpansionModule,
     HttpClientModule,
     FormsModule,

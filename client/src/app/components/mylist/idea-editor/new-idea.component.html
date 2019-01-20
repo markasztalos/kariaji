@@ -77,5 +77,5 @@
 </mat-dialog-content>
 <mat-dialog-actions>
   <button mat-button (click)="cancel()">VISSZA</button>
-  <button mat-button (click)="create()" [disabled]="!usersAdded.length" color="primary">LÉTREHOZÁS</button>
+  <button mat-button (click)="create()" [disabled]="!usersAdded.length || sending" color="primary">LÉTREHOZÁS</button>
 </mat-dialog-actions>

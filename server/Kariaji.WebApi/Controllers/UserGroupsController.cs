@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Kariaji.WebApi.DAL;
@@ -212,6 +213,8 @@ namespace Kariaji.WebApi.Controllers
         {
             if (!(await ugSvc.CanAdministerGroup(model.GroupId, CurrentUser.Id)))
                 throw KariajiException.NotAuthorized;
+            if (model.IsAdministrator && await ugSvc.IsManagedUser(model.UserId))
+                throw KariajiException.BadParamters;
             await this.ugSvc.UpdateMembership(model.GroupId, model.UserId, model.IsAdministrator);
         }
 
@@ -225,11 +228,11 @@ namespace Kariaji.WebApi.Controllers
 
         [HttpPost]
         [Route("managed-users")]
-        public async Task<ActionResult<CompactUserInfo>> CreateManagedUser(string displayName)
+        public async Task<ActionResult<CompactUserInfo>> CreateManagedUser([FromBody]UpdateAccountModel model)
         {
-            if (!await this.ugSvc.IsManagedUserNameFree(CurrentUser.Id, displayName))
+            if (!await this.ugSvc.IsManagedUserNameFree(CurrentUser.Id, model.DisplayName))
                 throw KariajiException.NewPublic("Már létezik ilyen nevű felügyelt fiókod");
-            var user = await this.ugSvc.CreateManagedUserAsync(CurrentUser.Id, displayName);
+            var user = await this.ugSvc.CreateManagedUserAsync(CurrentUser.Id, model.DisplayName);
             return user.ToCompactInfo();
         }
 
@@ -243,17 +246,22 @@ namespace Kariaji.WebApi.Controllers
             return Ok();
         }
 
+        public class AddManagerToUserModel
+        {
+            public int ManagerUserId { get;set; }
+        }
+
         [HttpPost]
         [Route("managed-users/{managedUserId}/managers")]
-        public async Task<ActionResult> AddManagerToUser(int managerUserId, int managedUserId)
+        public async Task<ActionResult> AddManagerToUser([FromBody] AddManagerToUserModel model, int managedUserId)
         {
             if (!await this.ugSvc.IsManagerOfUser(CurrentUser.Id, managedUserId))
                 throw KariajiException.NotAuthorized;
 
-            if (await this.ugSvc.IsManagerOfUser(managerUserId, managedUserId))
+            if (await this.ugSvc.IsManagerOfUser(model.ManagerUserId, managedUserId))
                 throw KariajiException.NewPublic("Már hozzáadtad!");
 
-            await this.ugSvc.AddManagerToUser(managerUserId, managedUserId);
+            await this.ugSvc.AddManagerToUser(model.ManagerUserId, managedUserId);
             return Ok();
 
         }
@@ -269,25 +277,88 @@ namespace Kariaji.WebApi.Controllers
             return Ok();
         }
 
+        public class AddManagedUserToGroupModel
+        {
+            public int GroupId { get; set; }
+        }
+
         [HttpPut]
         [Route("managed-users/{managedUserId}/groups/{groupId}")]
-        public async Task<ActionResult> AddManagedUserToGroup(int managedUserId, int groupId)
+        public async Task<ActionResult> AddManagedUserToGroup(int managedUserId, [FromBody] AddManagedUserToGroupModel model)
         {
             if (!await ugSvc.IsManagerOfUser(CurrentUser.Id, managedUserId))
                 throw KariajiException.NotAuthorized;
-            if (!await ugSvc.IsMemberOfGroup(groupId, CurrentUser.Id))
+            if (!await ugSvc.IsMemberOfGroup(model.GroupId, CurrentUser.Id))
                 throw KariajiException.NotAuthorized;
-            if (await ugSvc.IsMemberOfGroup(groupId, managedUserId))
+            if (await ugSvc.IsMemberOfGroup(model.GroupId, managedUserId))
                 throw KariajiException.BadParamters;
 
-            var m = await ugSvc.AddManagedUserToGroup(managedUserId, groupId);
+            var m = await ugSvc.AddManagedUserToGroup(managedUserId, model.GroupId);
             return Ok();
         }
 
+        [HttpPut]
+        [Route("users/{userId}")]
+        public async Task<ActionResult<CompactUserInfo>> UpdateManagedAccount(int userId, [FromBody]UpdateAccountModel model)
+        {
+            if (!this.ModelState.IsValid)
+                return BadRequest(CommonResult.NewError());
 
+            if (!await this.ugSvc.IsManagerOfUser(CurrentUser.Id, userId))
+                throw KariajiException.NotAuthorized;
 
+            var user = await this.ugSvc.UpdateUserAccount(userId, model.DisplayName);
+            return Ok(user.ToCompactInfo());
+        }
 
+        [HttpGet]
+        [Route("managed-users")]
+        public async Task<ActionResult<List<ManagedUserdata>>> GetManagedUsers()
+        {
+            var managedUsers = await this.ugSvc.GetManagedUsers(CurrentUser.Id);
+            return managedUsers;
+        }
 
+        [HttpPut]
+        [Route("managed-users/{userId}/avatar")]
+        public async Task<ActionResult> UpdateAvatarOfManagedUser(int userId, [FromForm] IFormFile image)
+        {
+            if (!await this.ugSvc.IsManagerOfUser(CurrentUser.Id, userId))
+                throw KariajiException.NotAuthorized;
+            var avatar = new Avatar
+            {
+                UserId = userId,
+                ContentType = image.ContentType
+            };
+            using (var memoryStream = new MemoryStream())
+            {
+                await image.CopyToAsync(memoryStream);
+                avatar.Data = memoryStream.ToArray();
+                
+            }
+            await this.ugSvc.UpdateAvatarAsync(avatar);
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("managed-users/{userId}/avatar")]
+        public async Task<ActionResult> DeleteAvatarOfManagedUser(int userId)
+        {
+            if (!await this.ugSvc.IsManagerOfUser(CurrentUser.Id, userId))
+                throw KariajiException.NotAuthorized;
+            await this.ugSvc.DeleteAvatar(userId);
+            return Ok();
+        }
+
+        [HttpDelete]
+        [Route("managed-users/{managedUserId}/groups/{groupId}")]
+        public async Task<ActionResult> RemoveManagedUserFromGroup(int managedUserId, int groupId)
+        {
+            if (!await this.ugSvc.IsManagerOfUser(CurrentUser.Id, managedUserId))
+                throw KariajiException.NotAuthorized;
+            await this.ugSvc.DeleteMembership(groupId, managedUserId);
+            return Ok();
+        }
 
     }
 }

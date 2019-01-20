@@ -1,0 +1,127 @@
+<mat-card style="min-width:500px;">
+  <mat-card-title>Felügyelt fiókok</mat-card-title>
+  <mat-card-content>
+
+    <button mat-raised-button color="accent" (click)="showNewManagedUserDialog()">
+      Új felügyelt fiók létrehozása
+    </button>
+
+    <br />
+    <div class="text-right">
+      <button mat-mini-fab (click)="refresh()">
+        <mat-icon>refresh</mat-icon>
+      </button>
+
+    </div>
+    <mat-spinner *ngIf="!managedUsers"></mat-spinner>
+    <table #managedUsersTable mat-table [dataSource]="managedUsers" class="w-100">
+
+
+      <ng-container matColumnDef="displayName">
+        <th mat-header-cell *matHeaderCellDef> Név </th>
+        <td mat-cell *matCellDef="let managedUser">
+          <div class="d-flex align-items-center">
+
+            <kariaji-user-avatar [userId]="managedUser.id"></kariaji-user-avatar>
+
+          </div>
+
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="managerUserIds">
+        <th mat-header-cell *matHeaderCellDef> Menedzselik </th>
+        <td mat-cell *matCellDef="let managedUser">
+          <div class="d-flex align-items-center flex-wrap">
+            <ng-container *ngFor="let uid of managedUser.managerUserIds">
+              <kariaji-user-avatar style="margin-right:4px;" [userId]="uid"></kariaji-user-avatar>
+            </ng-container>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="containerGroupIds">
+        <th mat-header-cell *matHeaderCellDef> Csoportjai </th>
+        <td mat-cell *matCellDef="let managedUser">
+          <div class="d-flex align-items-center flex-wrap">
+            <ng-container *ngFor="let id of managedUser.containerGroupIds">
+              <kariaji-group-avatar style="margin-right:4px;" [groupId]="id"></kariaji-group-avatar>
+            </ng-container>
+          </div>
+        </td>
+      </ng-container>
+
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef> </th>
+        <td mat-cell *matCellDef="let managedUser">
+          <button (click)="showEditManagedUserDialog(managedUser)" style="margin-left:4px;" mat-mini-fab color="accent">
+            <!-- {{managedUser.displayName}} -->
+            <mat-icon>edit</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+
+    </table>
+  </mat-card-content>
+</mat-card>
+
+
+
+
+
+<ng-template #newManagedUserDialogTemplate>
+  <h2 mat-dialog-title>Új fiók létrehozása</h2>
+  <mat-dialog-content>
+    <mat-form-field class="w-100">
+      <input matInput placeholder="Megjelenített név" [(ngModel)]="newUserDiaplayName" name="newUserDiaplayName" id="newUserDiaplayName" required />
+      <mat-hint *ngIf="!newUserDiaplayName">Kötelező megadni</mat-hint>
+      <mat-hint *ngIf="isNewDisplayNameUsed">Ez a név már foglalt</mat-hint>
+    </mat-form-field>
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button mat-dialog-close>VISSZA</button>
+    <button mat-button [disabled]="!(newUserDiaplayName && !isNewDisplayNameUsed)" (click)="createNewManagedUser()">LÉTREHOZOM</button>
+  </mat-dialog-actions>
+</ng-template>
+
+<ng-template #editManagedUserDialogTemplate>
+  <h2 mat-dialog-title>Fiók szerkesztése</h2>
+  <mat-dialog-content *ngIf="editedManagedUser" style="min-width:400px;">
+    <h5>Név</h5>
+    <div class="d-flex">
+      <mat-form-field class="w-100">
+        <input matInput placeholder="Megjelenített név" [(ngModel)]="editedDisplayName" name="editedDisplayName" id="editedDisplayName" required />
+        <mat-hint *ngIf="!editedDisplayName">Kötelező megadni</mat-hint>
+        <mat-hint *ngIf="isEditedDisplayNameUsed">Ez a név már foglalt</mat-hint>
+      </mat-form-field>
+      <button mat-mini-fab (click)="updateEditedDisplayName()" [disabled]="!(editedDisplayName && !isEditedDisplayNameUsed && (editedDisplayName !== editedManagedUser.displayName))">
+        <mat-icon>save</mat-icon>
+      </button>
+    </div>
+    <h5>Profilkép</h5>
+    <kariaji-avatar-selector [userId]="editedManagedUser.id" class="w-100"></kariaji-avatar-selector>
+
+    <br />
+    <h5>Kik szerkeszthetik?</h5>
+    <kariaji-user-list-selector [spinning]="editedUsersSpinning" [cannotRemoveIds]="[userId]" [users]="users" [selectedUsers]="editedManagedUser.managerUserIds" (userSelected)="onManagerUserAddedToEditedManagedUser($event)" (userDeselected)="onManagerUserRemovedFromEditedManagedUser($event)"></kariaji-user-list-selector>
+
+    <br />
+    <h5>Csoportjai</h5>
+    <kariaji-group-list-selector [spinning]="editedGroupsSpinning" [groups]="containerGroupIds" [selectedGroups]="editedManagedUser.containerGroupIds" (groupSelected)="onGroupAddedToEditedManagedUser($event)" (groupDeselected)="onGroupRemovedFromEditedManagedUser($event)">
+    </kariaji-group-list-selector>
+
+    <br />
+    <button mat-raised-button class="w-100" color="warn" (click)="deleteEditedMangedUser()">
+      <mat-icon>delete</mat-icon>
+      Fiók törlése
+    </button>
+    <br />
+    <br />
+    <br />
+  </mat-dialog-content>
+  <mat-dialog-actions>
+    <button mat-button mat-dialog-close>VISSZA</button>
+  </mat-dialog-actions>
+</ng-template>

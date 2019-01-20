@@ -31,7 +31,7 @@ export class MyAccountApiService extends ApiBaseService {
     }
 
     
-    updateOwnAvatar(file: File) : Observable<any>{
+    updateOwnAvatar(file: File) : Observable<any> {
         const formData = new FormData();
         formData.append('image', file);
         return this.put('my-account/avatar', formData);

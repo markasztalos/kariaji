@@ -101,6 +101,7 @@ export class NewIdeaComponent implements OnInit, OnDestroy {
   }
   create() {
     if (this.textEditor.getText().trim()) {
+      this.sending = true;
       this.ideasApi.createNewIdea({
         textDelta: this.textEditor.getContents(),
         secretUserIds: this.addedHiddenUsers.map(u => u.id),
@@ -112,4 +113,5 @@ export class NewIdeaComponent implements OnInit, OnDestroy {
       });
     }
   }
+  sending: boolean = false;
 }

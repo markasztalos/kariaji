@@ -26,12 +26,14 @@ export class AvatarSelectorComponent implements OnInit, OnDestroy {
     this.ngUnsubsribe.complete();
   }
 
-  constructor(private sanitizer: DomSanitizer, private myAccountState: MyAccountStateWrapperService, private dialogs: KariajiDialogsService, private ugApi: UserGroupApiService, private myAccountApi: MyAccountApiService, private avatarStateSvc: AvatarsStateService) {
+  constructor(private sanitizer: DomSanitizer, 
+    private myAccountState: MyAccountStateWrapperService, private dialogs: KariajiDialogsService, private ugApi: UserGroupApiService, private myAccountApi: MyAccountApiService, private avatarStateSvc: AvatarsStateService) {
 
   }
 
+  ownUserId : number;
   async ngOnInit() {
-    this.userId = (await this.myAccountState.getCurrentUser().toPromise()).id;
+    this.ownUserId = (await this.myAccountState.getCurrentUser().toPromise()).id;
     this.displayName$.pipe(takeUntil(this.ngUnsubsribe)).subscribe(() => this.manuallyRefreshAvatarComponent());
 
     this.avatarStateSvc.getAvatarUrl$(this.userId).pipe(takeUntil(this.ngUnsubsribe)).subscribe(src => {
@@ -61,7 +63,10 @@ export class AvatarSelectorComponent implements OnInit, OnDestroy {
       // reader.onload = (e: Event) => this.src = (<any>e.target).result;
       // reader.readAsDataURL(file);
       // this.refreshAvatarComponent();
-      this.myAccountApi.updateOwnAvatar(file).subscribe(() => {
+
+      ((this.userId === this.ownUserId) ? 
+        this.myAccountApi.updateOwnAvatar(file) :
+        this.ugApi.updateAvatarOfManagedUser(this.userId, file)).subscribe(() => {
         this.fileSelector.nativeElement.value = null;
         this.avatarStateSvc.invalidateAvatarUrl(this.userId);
       });
@@ -69,7 +74,7 @@ export class AvatarSelectorComponent implements OnInit, OnDestroy {
   }
 
   deleteAvatar() {
-    this.myAccountApi.deleteOwnAvatar().subscribe(() =>
+    ((this.userId === this.ownUserId) ? this.myAccountApi.deleteOwnAvatar() : this.ugApi.deleteAvatarOfManagedUser(this.userId)).subscribe(() =>
       this.avatarStateSvc.invalidateAvatarUrl(this.userId));
   }
 
@@ -82,7 +87,7 @@ export class AvatarSelectorComponent implements OnInit, OnDestroy {
     setTimeout(() => this.showAvatar = true);
   }
 
-  userId: number;
+  @Input() userId: number;
   displayName$: Observable<string> = this.myAccountState.provideCurrentUser().pipe(map(u => u ? u.displayName : null));
 
 

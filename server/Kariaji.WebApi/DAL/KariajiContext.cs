@@ -121,13 +121,15 @@ namespace Kariaji.WebApi.DAL
             modelBuilder.Entity<IdeaComment>()
                 .HasIndex(i => i.UserId);
 
-            modelBuilder.Entity<UserManagement>()
-                .HasIndex(m => new { m.ManagerUserId, m.ManagedUserId })
+
+            modelBuilder.Entity<Supervision>().HasKey(u => u.SupervisionId);
+            modelBuilder.Entity<Supervision>()
+                .HasIndex(m => new { ManagerUserId = m.ManagerId, ManagedUserId = m.ManagedId })
                 .IsUnique();
-            modelBuilder.Entity<UserManagement>()
-                .HasIndex(m => m.ManagerUserId);
-            modelBuilder.Entity<UserManagement>()
-                .HasKey(m => m.ManagedUserId);
+            modelBuilder.Entity<Supervision>()
+                .HasIndex(m => m.ManagerId);
+            modelBuilder.Entity<Supervision>()
+                .HasIndex(m => m.ManagedId);
 
 
 
@@ -146,7 +148,7 @@ namespace Kariaji.WebApi.DAL
             base.OnConfiguring(optionsBuilder);
         }
 
-        public DbSet<UserManagement> UserManagements { get; set; }
+        public DbSet<Supervision> Supervisions { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Configuration> Configurations { get; set; }
         public DbSet<Group> Groups { get; set; }

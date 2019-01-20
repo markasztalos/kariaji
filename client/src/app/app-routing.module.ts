@@ -11,6 +11,8 @@ import { GroupEditorComponent } from './components/groups-editor/group-editor.co
 import { MylistComponent } from './components/mylist/mylist.component';
 import { GiftsComponent } from './components/gifts/gifts.component';
 import { IdeasListComponent } from './components/ideas/ideas-list/ideas-list.component';
+import { DocComponent } from './components/common/doc.component';
+import { ManagedUsersEditorComponent } from './components/managed-users/managed-users-editor/managed-users-editor.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
@@ -25,6 +27,8 @@ const routes: Routes = [
       { path: 'group/:id', component: GroupEditorComponent },
       // { path: 'mylist', component: MylistComponent },
       { path: 'ideas', component: IdeasListComponent },
+      { path: 'doc', component: DocComponent },
+      { path: 'managed-users', component: ManagedUsersEditorComponent },
       { path: '', redirectTo: 'ideas', pathMatch: 'full' }
       // { path: 'gifts', component: GiftsComponent }
     ]

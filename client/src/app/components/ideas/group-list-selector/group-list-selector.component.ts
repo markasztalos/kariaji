@@ -23,7 +23,7 @@ export class GroupListSelectorComponent implements OnInit {
   selectedGroupsChange: EventEmitter<number[]> = new EventEmitter();
 
   @Output()
-  groupsSelected: EventEmitter<number> = new EventEmitter();
+  groupSelected: EventEmitter<number> = new EventEmitter();
 
   @Output()
   groupDeselected: EventEmitter<number> = new EventEmitter();
@@ -33,17 +33,18 @@ export class GroupListSelectorComponent implements OnInit {
   }
 
   addGroup(g: number) {
-    this.selectedGroups.push(g);
-    this.groupsSelected.next(g);
+    this.selectedGroups = [...this.selectedGroups,g];
+    this.groupSelected.next(g);
     this.selectedGroupsChange.next(this.selectedGroups);
   }
 
   removeGroup(g: number) {
-    this.selectedGroups.splice(this.selectedGroups.indexOf(g), 1);
+    this.selectedGroups = this.selectedGroups.filter(g2 => g2 !== g);
     this.groupDeselected.next(g);
     this.selectedGroupsChange.next(this.selectedGroups);
   }
 
-
+  @Input()
+  spinning = false;
 
 }

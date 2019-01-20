@@ -57,19 +57,27 @@ export class UserListSelectorComponent implements OnInit {
   @Output()
   userDeselected: EventEmitter<number> = new EventEmitter();
 
+  @Input()
+  cannotRemoveIds: number[] = [];
+
   get selectableUsers(): number[] {
     return this.users ? this.users.filter(u => this.selectedUsers.indexOf(u) < 0) : [];
   }
 
   addUser(u: number) {
-    this.selectedUsers.push(u);
+    this.selectedUsers = [...this.selectedUsers, u];
     this.userSelected.next(u);
     this.selectedUsersChange.next(this.selectedUsers);
   }
 
   removeUser(u: number) {
-    this.selectedUsers.splice(this.selectedUsers.indexOf(u), 1);
-    this.userDeselected.next(u);
-    this.selectedUsersChange.next(this.selectedUsers);
+    if (this.canDeleteUser(u)) {
+      this.selectedUsers = this.selectedUsers.filter(u2 => u2 !== u);
+      this.userDeselected.next(u);
+      this.selectedUsersChange.next(this.selectedUsers);
+    }
   }
+  canDeleteUser(uid: number) { return this.cannotRemoveIds.indexOf(uid) < 0; }
+  @Input()
+  spinning = false;
 }

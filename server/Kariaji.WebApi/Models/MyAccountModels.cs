@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Kariaji.WebApi.Models
 {
-    public class UpdateMyAccountModel
+    public class UpdateAccountModel
     {
         [Required]
         public string DisplayName { get; set; }
