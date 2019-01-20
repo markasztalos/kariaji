@@ -79,7 +79,7 @@ namespace Kariaji.WebApi.Controllers
         {
             return await this.ugSvc.GetExistingEmailAddressesAsync(exceptUserIds);
         }
-        
+
 
         [HttpGet]
         [Route("groups/{groupId}/invitations")]
@@ -114,7 +114,7 @@ namespace Kariaji.WebApi.Controllers
         }
         [HttpGet]
         [Route("invitations/{invitationId}/reject")]
-        public  async Task<ActionResult> RejectInvitation(int invitationId)
+        public async Task<ActionResult> RejectInvitation(int invitationId)
         {
             await this.ugSvc.RejectInvitationAsync(invitationId, CurrentUser.Id);
             return Ok();
@@ -151,7 +151,7 @@ namespace Kariaji.WebApi.Controllers
 
         [HttpGet]
         [Route("user/{userId}/avatar")]
-        public  async Task<ActionResult> GetAvatar(int userId)
+        public async Task<ActionResult> GetAvatar(int userId)
         {
             //if (userId != CurrentUser.Id && (!(await this.ugSvc.AreUsersFriends(userId, CurrentUser.Id))))
             //    throw KariajiException.NotAuthorized;
@@ -194,7 +194,12 @@ namespace Kariaji.WebApi.Controllers
         [Route("memberships")]
         public async Task DeleteMembership(int userId, int groupId)
         {
-            if (!(await ugSvc.CanAdministerGroup(groupId, CurrentUser.Id)))
+            if (await ugSvc.IsManagerOfUser(CurrentUser.Id, userId))
+            {
+                if (!await ugSvc.IsMemberOfGroup(groupId, CurrentUser.Id))
+                    throw KariajiException.NotAuthorized;
+            }
+            else if (!(await ugSvc.CanAdministerGroup(groupId, CurrentUser.Id)))
                 throw KariajiException.NotAuthorized;
             if (userId == this.CurrentUser.Id)
                 this.InvalidateFriendUsersAndGroups();
@@ -218,6 +223,71 @@ namespace Kariaji.WebApi.Controllers
             return groups.Select(g => g.ToInfo()).ToList();
         }
 
-        
+        [HttpPost]
+        [Route("managed-users")]
+        public async Task<ActionResult<CompactUserInfo>> CreateManagedUser(string displayName)
+        {
+            if (!await this.ugSvc.IsManagedUserNameFree(CurrentUser.Id, displayName))
+                throw KariajiException.NewPublic("Már létezik ilyen nevű felügyelt fiókod");
+            var user = await this.ugSvc.CreateManagedUserAsync(CurrentUser.Id, displayName);
+            return user.ToCompactInfo();
+        }
+
+        [HttpDelete]
+        [Route("managed-users/{managedUserId}")]
+        public async Task<ActionResult> DeleteManagedUser(int managedUserId)
+        {
+            if (!await this.ugSvc.IsManagerOfUser(CurrentUser.Id, managedUserId))
+                throw KariajiException.NewPublic("Nem törölheted ezt a fiókot!");
+            await this.ugSvc.DeleteManagedUser(managedUserId);
+            return Ok();
+        }
+
+        [HttpPost]
+        [Route("managed-users/{managedUserId}/managers")]
+        public async Task<ActionResult> AddManagerToUser(int managerUserId, int managedUserId)
+        {
+            if (!await this.ugSvc.IsManagerOfUser(CurrentUser.Id, managedUserId))
+                throw KariajiException.NotAuthorized;
+
+            if (await this.ugSvc.IsManagerOfUser(managerUserId, managedUserId))
+                throw KariajiException.NewPublic("Már hozzáadtad!");
+
+            await this.ugSvc.AddManagerToUser(managerUserId, managedUserId);
+            return Ok();
+
+        }
+
+
+        [HttpDelete]
+        [Route("managed-users/{managedUserId}/managers/{managerUserId}")]
+        public async Task<ActionResult> RemoveManagerOfUser(int managerUserId, int managedUserId)
+        {
+            if (!await this.ugSvc.CanRemoveManagerOfUser(CurrentUser.Id, managerUserId, managedUserId))
+                throw KariajiException.NotAuthorized;
+            await this.ugSvc.RemoveManagerOfUser(managerUserId, managedUserId);
+            return Ok();
+        }
+
+        [HttpPut]
+        [Route("managed-users/{managedUserId}/groups/{groupId}")]
+        public async Task<ActionResult> AddManagedUserToGroup(int managedUserId, int groupId)
+        {
+            if (!await ugSvc.IsManagerOfUser(CurrentUser.Id, managedUserId))
+                throw KariajiException.NotAuthorized;
+            if (!await ugSvc.IsMemberOfGroup(groupId, CurrentUser.Id))
+                throw KariajiException.NotAuthorized;
+            if (await ugSvc.IsMemberOfGroup(groupId, managedUserId))
+                throw KariajiException.BadParamters;
+
+            var m = await ugSvc.AddManagedUserToGroup(managedUserId, groupId);
+            return Ok();
+        }
+
+
+
+
+
+
     }
 }

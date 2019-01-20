@@ -81,10 +81,10 @@ namespace Kariaji.WebApi.DAL
 
 
             modelBuilder.Entity<ReservationJoin>()
-                .HasIndex(rj => new {rj.ReservationId, rj.UserId})
+                .HasIndex(rj => new { rj.ReservationId, rj.UserId })
                 .IsUnique();
             modelBuilder.Entity<Membership>()
-                .HasIndex(m => new {m.GroupId, m.UserId})
+                .HasIndex(m => new { m.GroupId, m.UserId })
                 .IsUnique();
             modelBuilder.Entity<Membership>()
                 .HasIndex(m => m.UserId);
@@ -101,13 +101,13 @@ namespace Kariaji.WebApi.DAL
                 .HasIndex(m => m.GroupId);
 
             modelBuilder.Entity<IdeaTargetGroup>()
-                .HasIndex(itg => new {itg.GroupId, itg.IdeaId})
+                .HasIndex(itg => new { itg.GroupId, itg.IdeaId })
                 .IsUnique();
             modelBuilder.Entity<IdeaTargetGroup>()
                 .HasIndex(i => i.GroupId);
 
             modelBuilder.Entity<IdeaUser>()
-                .HasIndex(iu => new {iu.IdeaId, iu.UserId})
+                .HasIndex(iu => new { iu.IdeaId, iu.UserId })
                 .IsUnique();
             modelBuilder.Entity<IdeaUser>()
                 .HasIndex(iu => iu.IdeaId);
@@ -120,9 +120,15 @@ namespace Kariaji.WebApi.DAL
                 .HasIndex(i => i.IdeaId);
             modelBuilder.Entity<IdeaComment>()
                 .HasIndex(i => i.UserId);
-            
-                
-            
+
+            modelBuilder.Entity<UserManagement>()
+                .HasIndex(m => new { m.ManagerUserId, m.ManagedUserId })
+                .IsUnique();
+            modelBuilder.Entity<UserManagement>()
+                .HasIndex(m => m.ManagerUserId);
+            modelBuilder.Entity<UserManagement>()
+                .HasKey(m => m.ManagedUserId);
+
 
 
 
@@ -135,11 +141,12 @@ namespace Kariaji.WebApi.DAL
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             optionsBuilder
-                .UseLoggerFactory( new LoggerFactory(new[] { new ConsoleLoggerProvider((_, __) => true, true) }))
+                .UseLoggerFactory(new LoggerFactory(new[] { new ConsoleLoggerProvider((_, __) => true, true) }))
                 .EnableSensitiveDataLogging();
             base.OnConfiguring(optionsBuilder);
         }
 
+        public DbSet<UserManagement> UserManagements { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Configuration> Configurations { get; set; }
         public DbSet<Group> Groups { get; set; }

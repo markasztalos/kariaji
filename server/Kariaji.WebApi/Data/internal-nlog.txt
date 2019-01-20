@@ -1841,3 +1841,18 @@
 2019-01-19 20:45:30.4990 Info Adding target File Target[allfile]
 2019-01-19 20:45:30.5260 Info Configured from an XML element in D:\Mark\munka\kariaji\source\server\Kariaji.WebApi\bin\Debug\netcoreapp2.2\nlog.config...
 2019-01-19 20:45:30.5799 Info Found 21 configuration items
+2019-01-20 13:51:57.5614 Info Message Template Auto Format enabled
+2019-01-20 13:51:57.5800 Info Loading assembly: NLog.Web.AspNetCore
+2019-01-20 13:51:57.8443 Info Adding target File Target[allfile]
+2019-01-20 13:51:57.8612 Info Configured from an XML element in D:\Mark\munka\kariaji\source\server\Kariaji.WebApi\bin\Debug\netcoreapp2.2\nlog.config...
+2019-01-20 13:51:57.8962 Info Found 21 configuration items
+2019-01-20 13:52:55.9186 Info Message Template Auto Format enabled
+2019-01-20 13:52:55.9522 Info Loading assembly: NLog.Web.AspNetCore
+2019-01-20 13:52:56.2076 Info Adding target File Target[allfile]
+2019-01-20 13:52:56.2325 Info Configured from an XML element in D:\Mark\munka\kariaji\source\server\Kariaji.WebApi\bin\Debug\netcoreapp2.2\nlog.config...
+2019-01-20 13:52:56.2878 Info Found 21 configuration items
+2019-01-20 13:54:29.3870 Info Message Template Auto Format enabled
+2019-01-20 13:54:29.4112 Info Loading assembly: NLog.Web.AspNetCore
+2019-01-20 13:54:29.6295 Info Adding target File Target[allfile]
+2019-01-20 13:54:29.6539 Info Configured from an XML element in D:\Mark\munka\kariaji\source\server\Kariaji.WebApi\bin\Debug\netcoreapp2.2\nlog.config...
+2019-01-20 13:54:29.6935 Info Found 21 configuration items

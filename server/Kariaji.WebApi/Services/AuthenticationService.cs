@@ -37,7 +37,7 @@ namespace Kariaji.WebApi.Services
         public async Task CheckPassword(string email, string password)
         {
             var em = email.Trim().ToLower();
-            var user = await this.ctx.Users.FirstOrDefaultAsync(u => u.Email == em);
+            var user = await this.ctx.Users.FirstOrDefaultAsync(u => !u.IsDeleted && !u.IsManaged && u.Email == em);
             if (user == null)
             {
                 throw KariajiException.NewPublic("Ez az email cím még nincs regisztrálva");

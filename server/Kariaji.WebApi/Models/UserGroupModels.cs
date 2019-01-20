@@ -48,7 +48,9 @@ namespace Kariaji.WebApi.Models
         {
             DisplayName = string.IsNullOrEmpty(user.DisplayName) ? user.Email : user.DisplayName,
             Email = user.Email,
-            Id = user.Id
+            Id = user.Id,
+            IsManaged = user.IsManaged,
+            ManagerUserIds = user.ManagerUsers?.Select(u =>u.ManagerUserId).ToList()
         };
 
         public static OwnMembershipInfo ToOwnMembershipInfo(this Membership membership)
@@ -68,6 +70,8 @@ namespace Kariaji.WebApi.Models
         public string DisplayName { get; set; }
         public string Email { get; set; }
         public int Id { get; set; }
+        public bool IsManaged { get; set; }
+        public List<int> ManagerUserIds { get; set; }
     }
 
     public class CompactGroupInfo

@@ -7,6 +7,7 @@ using Kariaji.WebApi.Middlewares;
 using Kariaji.WebApi.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Z.EntityFramework.Plus;
 
 namespace Kariaji.WebApi.Services
 {
@@ -69,6 +70,10 @@ namespace Kariaji.WebApi.Services
             return await this.ctx.Groups.Select(g => g.DisplayName).ToListAsync();
         }
 
+        public async Task<bool> IsManagedUser(int userId)
+        {
+            return (await ctx.Users.Where(u => u.Id == userId).Select(u => u.IsManaged).FirstOrDefaultAsync());
+        }
         public async Task<Group> CreateNewGroupAsync(CreateNewGroupModel model, int currentUserId)
         {
             if (model.Name != null)
@@ -312,6 +317,98 @@ namespace Kariaji.WebApi.Services
                     .SelectMany(g => g.Memberships.Where(m => !m.IsDeleted).Select(m => m.UserId)).ToListAsync();
             return userIds;
         }
+
+        public async Task<bool> IsManagedUserNameFree(int managerUserId, string displayName)
+        {
+            var displayNameToLower = displayName.ToLower().Trim();
+            return !await ctx.Users.AnyAsync(u =>
+                u.IsManaged && u.ManagerUsers.Any(m => m.ManagerUserId == managerUserId) &&
+                u.DisplayName.ToLower() == displayName);
+        }
+
+        public async Task<User> CreateManagedUserAsync(int managerUserId, string displayName)
+        {
+            
+            var user = new User
+            {
+                DisplayName = displayName,
+                IsManaged = true,
+            };
+            var management = new UserManagement
+            {
+                ManagedUser = user,
+                ManagerUserId = managerUserId
+            };
+            user.ManagerUsers.Add(management);
+            this.ctx.Users.Add(user);
+            await this.ctx.SaveChangesAsync();
+            return user;
+        }
+
+
+        public async Task<bool> IsManagerOfUser(int managerUserId, int managedUserId)
+        {
+            return await this.ctx.UserManagements.AnyAsync(m =>
+                m.ManagedUserId == managedUserId && m.ManagerUserId == managerUserId && !m.ManagerUser.IsDeleted);
+        }
+
+
+
+        public async Task DeleteManagedUser(int managedUserId)
+        {
+            var user = await this.ctx.Users.FirstOrDefaultAsync(u => u.Id == managedUserId);
+            user.IsDeleted = true;
+            //var managements = await this.ctx.UserManagements.Where(m => m.ManagedUserId == managedUserId).ToListAsync();
+            //ctx.UserManagements.RemoveRange(managements);
+            await ctx.SaveChangesAsync();
+        }
+
+
+
+        public async Task AddManagerToUser(int managedUserId, int managerUserId)
+        {
+            var management = new UserManagement
+            {
+                ManagedUserId = managedUserId,
+                ManagerUserId = managerUserId
+            };
+            ctx.UserManagements.Add(management);
+            await ctx.SaveChangesAsync();
+        }
+
+        
+        public async Task<bool> CanRemoveManagerOfUser(int currentUserId, int managerUserId, int managedUserId)
+        {
+            return await this.IsManagerOfUser(currentUserId, managedUserId) &&
+                   (managerUserId == currentUserId ? 
+                    ((await this.ctx.UserManagements.Where(m => m.ManagedUserId ==managedUserId).CountAsync()) > 1)
+                   : (await this.IsManagerOfUser(managerUserId, managedUserId))
+                   );
+        }
+
+        public async Task RemoveManagerOfUser(int managerUserId, int managedUserId)
+        {
+            var management = await ctx.UserManagements.FirstOrDefaultAsync(m =>
+                m.ManagedUserId == managerUserId && m.ManagedUserId == managedUserId);
+            ctx.UserManagements.Remove(management);
+            await ctx.SaveChangesAsync();
+        }
+
+        public async Task<Membership> AddManagedUserToGroup(int managedUserId, int groupId)
+        {
+            var m = new Membership
+            {
+                UserId = managedUserId,
+                GroupId = groupId,
+                IsAdministrator = false,
+                IsDeleted = false
+            };
+            this.ctx.Memberships.Add(m);
+            await this.ctx.SaveChangesAsync();
+            return m;
+        }
+
+
         
     }
 

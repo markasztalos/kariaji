@@ -11,17 +11,17 @@ export class UserGroupApiService extends ApiBaseService {
     deleteInvitation(id: number): Observable<any> {
         return this.delete(`/invitations/${id}`);
     }
-    acceptInvitation(id : number) : Observable<any> {
+    acceptInvitation(id: number): Observable<any> {
         return this.get(`/invitations/${id}/accept`);
     }
-    rejectInvitation(id : number) : Observable<any> {
+    rejectInvitation(id: number): Observable<any> {
         return this.get(`/invitations/${id}/reject`);
     }
-    
+
     getInvitationsOfGroup(groupId: number): Observable<UserGroupInvitation[]> {
         return this.get<UserGroupInvitation[]>(`groups/${groupId}/invitations`);
     }
-    
+
     getMyInvitations(): Observable<UserGroupInvitation[]> {
         return this.get<UserGroupInvitation[]>(`invitations`);
     }
@@ -55,25 +55,43 @@ export class UserGroupApiService extends ApiBaseService {
         return this.get<OwnMembership[]>(`/memberships`);
     }
 
-    getAvatar(userId : number) : Observable<Blob> {
+    getAvatar(userId: number): Observable<Blob> {
         return this.getBlob(`user/${userId}/avatar`);
     }
 
-    getUser(userId : number) : Observable<CompactUser> {
+    getUser(userId: number): Observable<CompactUser> {
         return this.get<CompactUser>(`user/${userId}`);
     }
 
-    updateMembership(userId : number, groupId: number, isAdministrator : boolean) : Observable<any> {
-        return this.put(`memberships`, {userId, groupId, isAdministrator});
+    updateMembership(userId: number, groupId: number, isAdministrator: boolean): Observable<any> {
+        return this.put(`memberships`, { userId, groupId, isAdministrator });
     }
-    deleteMembership(userId: number, groupId: number) : Observable<any> {
-        return this.delete(buildUrl('memberships', {userId, groupId}));
+    deleteMembership(userId: number, groupId: number): Observable<any> {
+        return this.delete(buildUrl('memberships', { userId, groupId }));
     }
-    getContainerGroups() : Observable<Group[]> {
+    getContainerGroups(): Observable<Group[]> {
         return this.get(`container-groups`);
     }
 
-    public getDataOfFriends() : Observable<FriendsData> {
+    public getDataOfFriends(): Observable<FriendsData> {
         return this.get(`friends`);
+    }
+
+
+    public createManagedUser(displayName: string) : Observable<any> {
+        return this.post(`managed-users?displayName=${displayName}`, {});
+    }
+    public deleteManagedUser(managedUserId : number) {
+        return this.delete(`managed-users/${managedUserId}`);
+    }
+    public addManagerToUser(managerUserId : number, managedUserId : number) {
+        return this.post(`managed-users/${managedUserId}/managers`, {});
+    }
+    public removeManagerOfUser(managerUserId : number, managedUserId : number) {
+        return this.delete(`managed-users/{managedUserId}/managers/${managerUserId}`);
+    }
+    public async addManagedUserToGroup(managedUserId : number, groupId : number)
+    {
+        return this.put(`managed-users/${managedUserId}/groups/{groupId}`, {});
     }
 }
