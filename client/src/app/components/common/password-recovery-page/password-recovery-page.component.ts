@@ -6,15 +6,16 @@ import { NgStoreService } from 'src/app/store/app.store';
 import { KariajiDialogsService } from 'src/app/services/dialogs.service';
 
 @Component({
-  selector: 'kariaji-confirm-registration',
-  templateUrl: './confirm-registration.component.html',
-  styleUrls: ['./confirm-registration.component.scss']
+  selector: 'kariaji-password-recovery-page',
+  templateUrl: './password-recovery-page.component.html',
+  styleUrls: ['./password-recovery-page.component.scss']
 })
-export class ConfirmRegistrationComponent implements OnInit {
+export class PasswordRecoveryPageComponent implements OnInit {
 
-  constructor(private activatedRoute: ActivatedRoute,
+  constructor(private activatedRoute: ActivatedRoute, 
     private dialogs: KariajiDialogsService,
-    private router: Router, private authSvc: AuthenticationService, private storeSvc : NgStoreService) { }
+    
+    private router: Router, private authSvc: AuthenticationService, private storeSvc: NgStoreService) { }
 
   token: string;
   ngOnInit() {
@@ -29,9 +30,9 @@ export class ConfirmRegistrationComponent implements OnInit {
   password1: string;
   password2: string;
 
-  async confirm() {
-    await this.authSvc.confirmRegistration(this.token, this.password1).subscribe(() => {
-      this.dialogs.toastSuccess("Sikeres regisztráció, most már beléphetsz");
+  async update() {
+    await this.authSvc.recoverPassword(this.token, this.password1).subscribe(() => {
+      this.dialogs.toastSuccess('A jelszót sikeresen megváltoztattad');
       this.router.navigate(['/login']);
     }, (error: HttpErrorResponse) => {
       alert(error.error.error);

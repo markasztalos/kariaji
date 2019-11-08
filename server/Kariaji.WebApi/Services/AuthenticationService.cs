@@ -25,14 +25,16 @@ namespace Kariaji.WebApi.Services
         private readonly MailingService mailingSvc;
         private readonly ProtectionService protectionService;
         private readonly ConfigurationProviderService configSvc;
+        //private readonly UserGroupManagerService ugSvc;
 
-
-        public AuthenticationService(KariajiContext ctx, ProtectionService protectionService, MailingService mailingSvc, ConfigurationProviderService configSvc)
+        public AuthenticationService(KariajiContext ctx, ProtectionService protectionService, MailingService mailingSvc,
+            ConfigurationProviderService configSvc/*, UserGroupManagerService ugSvc*/)
         {
             this.ctx = ctx;
             this.protectionService = protectionService;
             this.mailingSvc = mailingSvc;
             this.configSvc = configSvc;
+            //this.ugSvc = ugSvc;
         }
         public async Task CheckPassword(string email, string password)
         {
@@ -97,10 +99,58 @@ namespace Kariaji.WebApi.Services
 
             var link = Path.Combine(this.configSvc.Configuration.SiteBaseAddress, "confirm-registration?token=" + WebUtility.UrlEncode(token));
 
-            await this.mailingSvc.SendEmailAsync("Kariaji regisztráció", $"Link: {link}", email);
+            await this.mailingSvc.SendEmailAsync(
+                "Kariaji regisztráció", 
+                $"Kattints az alábbi linkre: {link}", email);
 
             return link;
         }
+
+        public async Task RecoverPassword(string token, string password)
+        {
+            var recoveryData = this.protectionService.UnprotectData<ForgotPasswordTokenModel>(token);
+            var date = recoveryData.RequestDate;
+            if (date.AddDays(1) < DateTime.Now)
+            {
+                throw KariajiException.NewPublic("Ez a kód már lejárt");
+            }
+            var email = recoveryData.Email;
+            var userId = recoveryData.UserId;
+            var existingUser = await ctx.Users.FirstOrDefaultAsync(u =>u.Id == userId);
+            if (existingUser == null)
+            {
+                throw KariajiException.NewPublic("Nem létezik ilyen felhasználó");
+            }
+
+            existingUser.Password = this.protectionService.HashPassword(password);
+            await this.ctx.SaveChangesAsync();
+
+        }
+
+        public async Task RequestPasswordRecovery(string email)
+        {
+            var em = email.Trim().ToLower();
+            var user = await ctx.Users.FirstOrDefaultAsync(u => u.Email == em);
+            if (user == null)
+            {
+                throw KariajiException.NewPublic("Ez az email cím nincs regisztrálva");
+            }
+
+            var token = this.protectionService.ProtecData(new ForgotPasswordTokenModel
+            {
+                Email = em,
+                UserId = user.Id,
+                RequestDate = DateTime.Now
+            });
+
+            var link = Path.Combine(this.configSvc.Configuration.SiteBaseAddress, "password-recovery?token=" + WebUtility.UrlEncode(token));
+
+            await this.mailingSvc.SendEmailAsync(
+                "Kariaji belépés jelszava",
+                $"A Kariaji oldalon az ehhez az emailhez tartozó jelszó megváltoztatását kérték. Kattints a következő linkre: {link}", email);
+        }
+
+        
 
         public async Task<string> GenerateToken(string email)
         {
@@ -130,6 +180,8 @@ namespace Kariaji.WebApi.Services
             return tokenStr;
         }
 
+
+
         public bool Validatetoken(string tokenString, out int id)
         {
             id = -1;
@@ -157,6 +209,8 @@ namespace Kariaji.WebApi.Services
 
 
         }
+
+        
 
      
     }

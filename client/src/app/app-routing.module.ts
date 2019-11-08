@@ -13,10 +13,14 @@ import { GiftsComponent } from './components/gifts/gifts.component';
 import { IdeasListComponent } from './components/ideas/ideas-list/ideas-list.component';
 import { DocComponent } from './components/common/doc.component';
 import { ManagedUsersEditorComponent } from './components/managed-users/managed-users-editor/managed-users-editor.component';
+import { ForgotPasswordPageComponent } from './components/common/forgot-password-page/forgot-password-page.component';
+import { PasswordRecoveryPageComponent } from './components/common/password-recovery-page/password-recovery-page.component';
 
 const routes: Routes = [
   { path: 'login', component: LoginPageComponent },
   { path: 'register', component: RegisterPageComponent },
+  {path: 'forgot-password', component: ForgotPasswordPageComponent},
+  {path: 'password-recovery', component: PasswordRecoveryPageComponent},
   { path: 'confirm-registration', component: ConfirmRegistrationComponent },
   {
     path: '', component: MainComponent,

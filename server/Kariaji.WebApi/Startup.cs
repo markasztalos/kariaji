@@ -21,6 +21,8 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json.Serialization;
+using NLog.Extensions.Logging;
+using NLog.Web;
 using ILogger = NLog.ILogger;
 
 namespace Kariaji.WebApi
@@ -104,12 +106,12 @@ namespace Kariaji.WebApi
             services.AddScoped(typeof(ProtectionService));
             services.AddScoped(typeof(UserGroupManagerService));
             services.AddScoped(typeof(IdeasManagerService));
-
-
+            
+            
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IHostingEnvironment env, ILoggerFactory loggerFactory)
         {
             if (env.IsDevelopment())
             {
@@ -157,6 +159,14 @@ namespace Kariaji.WebApi
                 }
                 Test(context);
             }
+
+            //add NLog to ASP.NET Core
+            loggerFactory.AddNLog();
+
+            //add NLog.Web
+            app.AddNLogWeb();
+
+
         }
 
         public void Test(KariajiContext ctx)

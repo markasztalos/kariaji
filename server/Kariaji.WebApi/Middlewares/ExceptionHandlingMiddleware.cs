@@ -13,6 +13,17 @@ namespace Kariaji.WebApi.Middlewares
 {
     public class KariajiException : Exception
     {
+        public KariajiException()
+        {
+            
+        }
+
+        public KariajiException(Exception innerException) : base(null, innerException) 
+        {
+            
+        }
+
+
         public static KariajiException NotAuthorized =>
             KariajiException.NewPublic("Nincs jogosultságod ehhez a művelethez");
         public static KariajiException BadParamters =>
@@ -27,11 +38,20 @@ namespace Kariaji.WebApi.Middlewares
             PublicMessage = publicMessage
         };
 
+        public static KariajiException NewPublic(string publicMessage, Exception innerException) => new KariajiException(innerException)
+        {
+            PublicMessage = publicMessage
+            
+        };
+
+
         public static KariajiException NewLog(string logMessage, string  publicMessage= null) => new KariajiException
         {
             LogMessage = logMessage,
             PublicMessage = publicMessage
         };
+
+     
 
 
 

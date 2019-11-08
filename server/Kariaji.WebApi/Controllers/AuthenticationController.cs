@@ -46,6 +46,24 @@ namespace Kariaji.WebApi.Controllers
             return Ok();
         }
 
+        [HttpPost("forgot-password")]
+        public async Task<ActionResult/*<RegisterResultModel>*/> RequestPasswordRecovery([FromBody] RegisterModel model)
+        {
+            await this.authSvc.RequestPasswordRecovery(model.Email);
+            //return Ok(new RegisterResultModel
+            //{
+            //    Link = link
+            //});
+            return Ok();
+        }
+
+        [HttpPost("password-recovery")]
+        public async Task<ActionResult> RecoverPassword([FromBody] PasswordRecoveryModel model)
+        {
+            await this.authSvc.RecoverPassword(model.Token, model.NewPassword);
+            return Ok();
+        }
+
         [HttpPost("confirm-registration")]
         public async Task<ActionResult> ConfirmRegistration([FromBody] ConfirmRegistrationModel model)
         {

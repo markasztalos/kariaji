@@ -3,8 +3,12 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Mail;
+using System.Text;
 using System.Threading.Tasks;
 using Kariaji.WebApi.DAL;
+using Kariaji.WebApi.Middlewares;
+using Microsoft.Extensions.Logging;
+using NLog;
 
 namespace Kariaji.WebApi.Services
 {
@@ -24,9 +28,15 @@ namespace Kariaji.WebApi.Services
         private readonly ProtectionService protectionService;
         private readonly KariajiContext dbContext;
         private readonly ConfigurationProviderService configProviderSvc;
+        private ILogger<MailingService> logger;
 
-        public MailingService(KariajiContext dbContext, ProtectionService protectionService, ConfigurationProviderService configProviderSvc)
+
+        public MailingService(KariajiContext dbContext, 
+            ProtectionService protectionService, 
+            ILogger<MailingService> logger,
+            ConfigurationProviderService configProviderSvc)
         {
+            this.logger = logger;
             this.dbContext = dbContext;
             this.protectionService = protectionService;
             this.configProviderSvc = configProviderSvc;
@@ -62,13 +72,15 @@ namespace Kariaji.WebApi.Services
                     Port = this.Configuration.AdminEmailSMTPPort,
                     UseDefaultCredentials = false,
                     Credentials = new NetworkCredential(this.Configuration.AdminEmailUserName,
-                        this.Configuration.AdminEmailUserPassword)
+                        this.Configuration.AdminEmailUserPassword),
+                    DeliveryFormat = SmtpDeliveryFormat.International
+                    
                 };
                 var msg = new MailMessage
                 {
                     From = new MailAddress(Configuration.AdminEmailAddress, Configuration.AdminEmailFullName),
                     Subject = subject,
-                    Body = message
+                    Body = message,
                 };
                 foreach (var receiver in receiverAddresses)
                     msg.To.Add(new MailAddress(receiver));
@@ -76,10 +88,10 @@ namespace Kariaji.WebApi.Services
                 client.EnableSsl = true;
                 await client.SendMailAsync(msg);
             }
-            catch
+            catch (Exception ex)
             {
-                //todo log
-                Console.WriteLine("Nem sikerült elküldeni");
+                throw KariajiException.NewPublic("Nem sikerült elküldeni az emailt", ex);
+
             }
         }
 

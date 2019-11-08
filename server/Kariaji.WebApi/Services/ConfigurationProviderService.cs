@@ -31,7 +31,7 @@ namespace Kariaji.WebApi.Services
             AdminEmailFullName = "Kariaji",
             AdminEmailUserName = "kariaji.web@gmail.com",
             AdminEmailType = EmailTypes.GoogleMail,
-            AdminEmailUserPassword = this.protectionService.ProtectPassword("1024Archers"),
+            AdminEmailUserPassword = this.protectionService.ProtectPassword("1025Archers"),
             SiteBaseAddress = "http://localhost:4208/",
             JWTKey = ProtectionService.JwtKey,
             PasswordSalt = ProtectionService.Salt

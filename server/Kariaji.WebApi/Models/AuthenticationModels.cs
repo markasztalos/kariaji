@@ -5,7 +5,18 @@ using System.Threading.Tasks;
 
 namespace Kariaji.WebApi.Models
 {
-   
+    public class ForgotPasswordTokenModel
+    {
+        public int UserId { get; set; }
+        public DateTime RequestDate { get; set; }
+        public string Email { get; set; }
+    }
+
+    public class PasswordRecoveryModel
+    {
+        public string Token { get; set; }
+        public string NewPassword { get; set; }
+    }
 
     public class RegisterTokenModel
     {

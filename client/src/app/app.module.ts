@@ -73,6 +73,8 @@ import { UserListSelectorComponent } from './components/ideas/user-list-selector
 import { FriendsService } from './services/friends.service';
 import { ManagedUsersEditorComponent } from './components/managed-users/managed-users-editor/managed-users-editor.component';
 import { DocComponent } from './components/common/doc.component';
+import { ForgotPasswordPageComponent } from './components/common/forgot-password-page/forgot-password-page.component';
+import { PasswordRecoveryPageComponent } from './components/common/password-recovery-page/password-recovery-page.component';
 
 
 
@@ -103,6 +105,8 @@ import { DocComponent } from './components/common/doc.component';
     UserListSelectorComponent,
     ManagedUsersEditorComponent,
     DocComponent,
+    ForgotPasswordPageComponent,
+    PasswordRecoveryPageComponent
 
   ],
   imports: [

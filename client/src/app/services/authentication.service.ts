@@ -18,6 +18,20 @@ export class AuthenticationService extends ApiBaseService implements CanActivate
     super(http, dialogs);
   }
 
+  
+  public requestPassworRecovery(email : string): Observable<any> {
+    return this.http.post(`${this.apiBaseUrl}/auth/forgot-password`, {
+      email
+    });
+  }
+    
+  public recoverPassword(token : string, newPassword: string): Observable<any> {
+    return this.http.post(`${this.apiBaseUrl}/auth/password-recovery`, {
+      token,
+      newPassword
+    });
+  }
+
   public register(email: string): Observable</*{ link: string }*/any> {
     return this.http.post<{ link: string }>(`${this.apiBaseUrl}/auth/register`, {
       email
