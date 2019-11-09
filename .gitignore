@@ -3,3 +3,5 @@ server/Kariaji.WebApi/bin
 server/Kariaji.WebApi/obj
 client/node_modules
 client/package_json.lock
+.vs/slnx.sqlite
+.vs/slnx.sqlite-journal
