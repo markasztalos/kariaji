@@ -10,8 +10,8 @@
   </h4>
   <mat-divider></mat-divider>
   <br />
-  <div class="d-flex align-items-center">
-    <button mat-mini-fab [matMenuTriggerFor]="addGroupMenu" title="Csoport hozzáadása" [disabled]="!addableGroups.length">
+  <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center flex-wrap">
+    <button class="p-0 mr-2 mb-2" mat-mini-fab [matMenuTriggerFor]="addGroupMenu" title="Csoport hozzáadása" [disabled]="!addableGroups.length">
       <mat-icon>group_add</mat-icon>
     </button>
     <mat-menu #addGroupMenu>
@@ -20,7 +20,7 @@
         <kariaji-group-avatar [groupId]="g.id"></kariaji-group-avatar>
       </button>
     </mat-menu>
-    <button color="warn" style="margin-left:3px; padding-left:4px;padding-right:4px;" mat-button *ngFor="let g of groupsAdded" (click)="removeGroup(g)">
+    <button color="warn" class="p-0 mr-2 mb-2" mat-button *ngFor="let g of groupsAdded" (click)="removeGroup(g)">
       <div class="d-flex align-items-center">
         <mat-icon>delete</mat-icon>
         <kariaji-group-avatar [groupId]="g.id"></kariaji-group-avatar>
@@ -35,8 +35,8 @@
   </h4>
   <mat-divider></mat-divider>
   <br />
-  <div class="d-flex align-items-center">
-    <button mat-mini-fab [matMenuTriggerFor]="addTargetMenu" color="primary" [disabled]="!addableUsers.length">
+  <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center flex-wrap">
+    <button  class="p-0 mr-2 mb-2"  mat-mini-fab [matMenuTriggerFor]="addTargetMenu" color="primary" [disabled]="!addableUsers.length">
       <mat-icon>person_add</mat-icon>
     </button>
     <mat-menu #addTargetMenu>
@@ -47,7 +47,7 @@
         </div>
       </button>
     </mat-menu>
-    <button color="warn" mat-button *ngFor="let u of usersAdded" style="padding-left:4px; padding-right:4px;margin-bottom:.5em;" (click)="removeUser(u)">
+    <button  class="p-0 mr-2 mb-2"  color="warn" mat-button *ngFor="let u of usersAdded" (click)="removeUser(u)">
       <div class="d-flex align-items-center">
         <mat-icon>delete</mat-icon>
         <kariaji-user-avatar [userId]="u.id"></kariaji-user-avatar>
@@ -57,8 +57,8 @@
   <h4 style="margin-top:1em;">A címzetteken kívül nem láthatják még</h4>
   <mat-divider></mat-divider>
   <br />
-  <div>
-    <button mat-mini-fab [matMenuTriggerFor]="addHiddenMenu" color="primary" [disabled]="!addableHiddenUsers.length">
+  <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center flex-wrap">
+    <button  class="p-0 mr-2 mb-2"  mat-mini-fab [matMenuTriggerFor]="addHiddenMenu" color="primary" [disabled]="!addableHiddenUsers.length">
       <mat-icon>person_add</mat-icon>
     </button>
     <mat-menu #addHiddenMenu>
@@ -69,7 +69,7 @@
         </div>
       </button>
     </mat-menu>
-    <button color="warn" mat-button *ngFor="let u of addedHiddenUsers" style="padding-left:4px; padding-right:4px;margin-left:.5em;" (click)="removeHiddenUser(u)">
+    <button  class="p-0 mr-2 mb-2"  color="warn" mat-button *ngFor="let u of addedHiddenUsers" (click)="removeHiddenUser(u)">
       <kariaji-user-avatar [userId]="u.id"></kariaji-user-avatar>
     </button>
   </div>

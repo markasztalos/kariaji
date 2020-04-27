@@ -44,6 +44,7 @@ export class AvatarsStateService {
 
     private pendingAvatarQueries: Set<number> = new Set();
     public getAvatarUrl$(userId: number): Observable<string> {
+        // console.log(`getting avatar url`, userId);
         this.ensureAvatarUrl(userId);
         return this.ngRedux.select(state => state.__avatars.get(userId));
     }

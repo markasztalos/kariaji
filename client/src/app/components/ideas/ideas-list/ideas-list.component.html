@@ -21,35 +21,38 @@
         <!-- <h4>
         Listák
       </h4> -->
-        <div class="d-flex align-items-center flex-wrap">
-          <button mat-raised-button color="primary" (click)="showMyList()" matTooltip="Saját magamnak kiírt ajándékok listája">
+        <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center flex-wrap">
+          
+          <button class="mr-2 mb-2" mat-raised-button color="primary" (click)="showMyList()" matTooltip="Saját magamnak kiírt ajándékok listája">
             Saját listám
           </button>
-          <div style="margin-left:1em; margin-top:3px; margin-bottom:3px;">
-            <button mat-raised-button [matMenuTriggerFor]="selectUserListMenu" matTooltip="Válaszd ki, hogy kinek szóló ajándékokat szeretnél látni">
-              Lista kiválasztása
+          <!-- <div style="margin-left:1em; margin-top:3px; margin-bottom:3px;"> -->
+          <button class="mr-2 mb-2" mat-raised-button [matMenuTriggerFor]="selectUserListMenu" matTooltip="Válaszd ki, hogy kinek szóló ajándékokat szeretnél látni">
+            Lista kiválasztása
+          </button>
+          <mat-menu #selectUserListMenu>
+            <button mat-menu-item *ngFor="let uid of usersInAllContainerGroups" (click)="showUserList(uid)">
+              <kariaji-user-avatar [userId]="uid"></kariaji-user-avatar>
             </button>
-            <mat-menu #selectUserListMenu>
-              <button mat-menu-item *ngFor="let uid of usersInAllContainerGroups" (click)="showUserList(uid)">
-                <kariaji-user-avatar [userId]="uid"></kariaji-user-avatar>
-              </button>
-            </mat-menu>
-          </div>
-          <button mat-raised-button color="accent" (click)="showAll()" style="margin-left:1em; margin-top:3px; margin-bottom:3px;" matTooltip="Mutasd az összes ajándékötletet">
+          </mat-menu>
+          <!-- </div> -->
+          <button class="mr-2 mb-2" mat-raised-button color="accent" (click)="showAll()" matTooltip="Mutasd az összes ajándékötletet">
             Összes ötlet, amit láthatok
           </button>
+
+          <div class=" mr-2 mb-2 d-flex align-items-center">
+              Oldalméret:
+              <mat-select placeholder="{{filters.take}}" style="margin-left:1em; width:50px;" [(ngModel)]="take">
+                <mat-option value="10">10</mat-option>
+                <mat-option value="30">30</mat-option>
+                <mat-option value="50">50</mat-option>
+                <mat-option value="100">100</mat-option>
+              </mat-select>
+            </div>
         </div>
 
         <br />
-        <div class="d-flex align-items-center">
-          Oldalméret:
-          <mat-select placeholder="{{filters.take}}" style="margin-left:1em; width:50px;" [(ngModel)]="take">
-            <mat-option value="10">10</mat-option>
-            <mat-option value="30">30</mat-option>
-            <mat-option value="50">50</mat-option>
-            <mat-option value="100">100</mat-option>
-          </mat-select>
-        </div>
+        
 
         <mat-expansion-panel style="margin-top:1em;">
           <mat-expansion-panel-header>

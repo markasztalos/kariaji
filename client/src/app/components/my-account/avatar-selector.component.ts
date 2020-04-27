@@ -26,20 +26,17 @@ export class AvatarSelectorComponent implements OnInit, OnDestroy {
     this.ngUnsubsribe.complete();
   }
 
-  constructor(private sanitizer: DomSanitizer, 
+  constructor(private sanitizer: DomSanitizer,
     private myAccountState: MyAccountStateWrapperService, private dialogs: KariajiDialogsService, private ugApi: UserGroupApiService, private myAccountApi: MyAccountApiService, private avatarStateSvc: AvatarsStateService) {
 
   }
 
-  ownUserId : number;
+  ownUserId: number;
   async ngOnInit() {
     this.ownUserId = (await this.myAccountState.getCurrentUser().toPromise()).id;
     this.displayName$.pipe(takeUntil(this.ngUnsubsribe)).subscribe(() => this.manuallyRefreshAvatarComponent());
 
-    this.avatarStateSvc.getAvatarUrl$(this.userId).pipe(takeUntil(this.ngUnsubsribe)).subscribe(src => {
-      this.src = src ? this.sanitizer.bypassSecurityTrustResourceUrl(src) : null;
-      this.manuallyRefreshAvatarComponent();
-    });
+
 
   }
 
@@ -64,12 +61,12 @@ export class AvatarSelectorComponent implements OnInit, OnDestroy {
       // reader.readAsDataURL(file);
       // this.refreshAvatarComponent();
 
-      ((this.userId === this.ownUserId) ? 
+      ((this.userId === this.ownUserId) ?
         this.myAccountApi.updateOwnAvatar(file) :
         this.ugApi.updateAvatarOfManagedUser(this.userId, file)).subscribe(() => {
-        this.fileSelector.nativeElement.value = null;
-        this.avatarStateSvc.invalidateAvatarUrl(this.userId);
-      });
+          this.fileSelector.nativeElement.value = null;
+          this.avatarStateSvc.invalidateAvatarUrl(this.userId);
+        });
     }
   }
 
@@ -87,7 +84,23 @@ export class AvatarSelectorComponent implements OnInit, OnDestroy {
     setTimeout(() => this.showAvatar = true);
   }
 
-  @Input() userId: number;
+  _userId: number;
+  @Input() set userId(value: number) {
+    if (value !== this._userId) {
+      this._userId = value;
+      if (value) {
+        this.avatarStateSvc.getAvatarUrl$(this.userId).pipe(takeUntil(this.ngUnsubsribe)).subscribe(src => {
+          this.src = src ? this.sanitizer.bypassSecurityTrustResourceUrl(src) : null;
+          this.manuallyRefreshAvatarComponent();
+        });
+      } else {
+        this.src = null;
+      }
+    }
+  }
+  get userId() {
+    return this._userId;
+  }
   displayName$: Observable<string> = this.myAccountState.provideCurrentUser().pipe(map(u => u ? u.displayName : null));
 
 

@@ -60,7 +60,7 @@ export class GroupEditorComponent implements OnInit {
 
   ngOnInit() {
     this.myAccountState.getCurrentUser().subscribe(u => {
-      console.log(u);
+      // console.log(u);
       this.userId = u.id;
     });
   }

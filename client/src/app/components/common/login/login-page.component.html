@@ -20,9 +20,13 @@
 
     </mat-card-content>
     <mat-card-actions>
-        <button  mat-button color="primary" [disabled]="!email || !password" (click)="login()">BELÉPÉS</button>
-        <a  mat-button [href]="['/register']">REGISZTRÁCIÓ</a>
-        <a  mat-button [href]="['/forgot-password']">ELFELEJTETT JELSZÓ</a>
+      <div class="d-flex flex-column flex-sm-row align-items-start align-items-sm-center flex-wrap">
+
+
+        <button class="mr-2 mb-2" mat-button color="primary" [disabled]="!email || !password" (click)="login()">BELÉPÉS</button>
+        <a class="mr-2 mb-2" mat-button [href]="['/register']">REGISZTRÁCIÓ</a>
+        <a mat-button class="mr-2 mb-2" [href]="['/forgot-password']">ELFELEJTETT JELSZÓ</a>
+      </div>
     </mat-card-actions>
 
   </mat-card>

@@ -1,5 +1,5 @@
 <span  [style.backgroundColor]="getRandomColor(user.displayName)" [style.height]="size + 'px'" style="cursor: pointer; display: inline;padding-right: 1em; color:white;border-radius: 10rem;" class="d-flex align-items-center justify-items-start" title="{{user.email}}" *ngIf="user">
-  <ngx-avatar style="line-height:21px" [size]="size" *ngIf="showAvatar && src" [src]="src" [name]="user.displayName"></ngx-avatar>
+  <ngx-avatar [style.line-height]="'21px'" [size]="size" *ngIf="showAvatar && src" [src]="src" [name]="user.displayName"></ngx-avatar>
   <span  [style.margin-left]="src ? '3px' : '1em'" *ngIf="user">{{user.displayName}}</span>
   <span class="flex-grow-1"></span>
 </span>

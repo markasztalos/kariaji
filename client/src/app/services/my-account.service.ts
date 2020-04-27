@@ -15,7 +15,7 @@ export class MyAccountApiService extends ApiBaseService {
         const o = this.get<CompactUser>(`/my-account`, { handleError: false });
         o.subscribe(null, (err) => {
             this.router.navigate(['/login']);
-        })
+        });
         return o;
     }
 

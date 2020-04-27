@@ -5,3 +5,4 @@ client/node_modules
 client/package_json.lock
 .vs/slnx.sqlite
 .vs/slnx.sqlite-journal
+client/dist

@@ -3,6 +3,7 @@ import { select } from '@angular-redux/store';
 import { MyAccountStateWrapperService, MyAccountActions, UsersStateService } from 'src/app/store/user-groups.redux';
 import { MyAccountApiService } from 'src/app/services/my-account.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'kariaji-settings',
@@ -14,13 +15,9 @@ export class SettingsComponent implements OnInit {
 
   }
 
-  constructor(private myAccountStateSvc : MyAccountStateWrapperService ) {
+  constructor(private myAccountStateSvc: MyAccountStateWrapperService) {
 
   }
-  userId$ = this.myAccountStateSvc.provideCurrentUser();
-
-
-
-  
+  userId$ = this.myAccountStateSvc.provideCurrentUser().pipe(map(user => user && user.id));
 
 }
